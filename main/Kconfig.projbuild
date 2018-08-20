@@ -1,0 +1,21 @@
+menu "Khronos Configuration"
+
+config SN
+    string "Serial Number"
+	default "SN0001"
+	help
+		Khronos unique serial number.
+
+config WIFI_SSID
+    string "WiFi SSID"
+	default "myssid"
+	help
+		Your Wi-Fi network name.
+
+config WIFI_PASSWORD
+    string "WiFi Password"
+	default "mypassword"
+	help
+		Your Wi-Fi network password. Leave blank if insecure.
+
+endmenu
