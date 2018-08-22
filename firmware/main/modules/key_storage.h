@@ -7,8 +7,19 @@
 #include "nvs_flash.h"
 
 class KeyStorage {
+    private:
+    nvs_handle handle;
+    esp_err_t ret;
+
+    int CheckError();
+
     public:
     int Init();
+
+    int WriteU32(const char* key, uint32_t num);
+    uint32_t ReadU32(const char* key);
+
+    int Commit();
 };
 
 #endif

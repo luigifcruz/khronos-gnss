@@ -20,6 +20,8 @@ esp_err_t Wireless::EventHandler(void *ctx, system_event_t *event) {
     default:
         break;
     }
+
+    mdns_handle_system_event(ctx, event);
     return ESP_OK;
 }
 

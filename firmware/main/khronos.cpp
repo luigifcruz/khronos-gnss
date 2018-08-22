@@ -8,6 +8,7 @@
 #include "modules/http_server.h"
 #include "modules/mdns_responder.h"
 #include "modules/web_sockets.h"
+#include "modules/database.h"
 
 extern "C" {
     void app_main();
@@ -20,13 +21,19 @@ void app_main() {
     FlashStorage flash;
     MdnsResponder mdns;
     WebSockets socks;
+    Database db;
     
     keys.Init();
-    flash.Init();
+    db.Init(&keys);
 
+    flash.Init();
     mdns.Init();
     wifi.Init();
     
     web.Init();
     socks.Init();
+
+    printf("Trying to read the value!\n");
+    uint32_t read = keys.ReadU32("ws_update_rate");
+    printf("Operation exited with %d\n", read);
 }

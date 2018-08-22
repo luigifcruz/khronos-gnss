@@ -14,8 +14,6 @@ int MdnsResponder::Init() {
     mdns_hostname_set(CONFIG_MDNS_HOSTNAME);
     mdns_instance_name_set(CONFIG_MDNS_INSTANCE);
 
-    mdns_service_add(NULL, "_http", "_tcp", 80, NULL, 0);
-
-    ESP_LOGI(CONFIG_SN, "[MDNS] Init completed!");
+    mdns_service_add("Web Server", "_http", "_tcp", 80, NULL, 0);
     return 0;
 }
