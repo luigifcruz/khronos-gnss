@@ -6,6 +6,8 @@
 #include "modules/flash_storage.h"
 #include "modules/wireless.h"
 #include "modules/http_server.h"
+#include "modules/mdns_responder.h"
+#include "modules/web_sockets.h"
 
 extern "C" {
     void app_main();
@@ -16,9 +18,15 @@ void app_main() {
     Wireless wifi;
     HttpServer web;
     FlashStorage flash;
-
+    MdnsResponder mdns;
+    WebSockets socks;
+    
     keys.Init();
-    wifi.Init();
-    web.Init();
     flash.Init();
+
+    mdns.Init();
+    wifi.Init();
+    
+    web.Init();
+    socks.Init();
 }

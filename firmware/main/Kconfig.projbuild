@@ -2,9 +2,21 @@ menu "Khronos Configuration"
 
 config SN
     string "Serial Number"
-	default "SN0001"
-	help
+	default "Khronos SN0001"
+	help 
 		Khronos unique serial number.
+
+config MDNS_HOSTNAME
+    string "MDNS Hostname"
+	default "khronos"
+	help
+		The mDNS hostname [this value].local
+	
+config MDNS_INSTANCE
+    string "MDNS Instance"
+	default "Khronos S/N SN0001"
+	help
+		The mDNS instance name.
 
 config WIFI_SSID
     string "WiFi SSID"
