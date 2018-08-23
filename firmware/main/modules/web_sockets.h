@@ -20,10 +20,11 @@ class WebSockets {
     private:
     Database* db;
 
-    static void ServerHandleQueue(void* taskStartParameters);
+    static void ServerHandleQueue(void* pvParameters);
     static void ServerHandleTask(void* pvParameters);
-    static void HttpServe(struct netconn *conn, void* task);
+    static void HttpServe(struct netconn *conn);
     static void WebSocketCallback(uint8_t num, WEBSOCKET_TYPE_t type, char* msg, uint64_t len, void* parameter);
+    //void HandleRequest(uint8_t num,  char* msg, uint64_t len, Database* db);
 
     public:
     int Init(Database* db);

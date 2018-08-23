@@ -21,7 +21,7 @@ void app_main() {
     FlashStorage flash;
     MdnsResponder mdns;
     WebSockets ws;
-    Database db;
+    static Database db;
     
     keys.Init();
     db.Init(&keys);
