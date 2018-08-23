@@ -22,6 +22,9 @@ class Database {
     State state;
     KeyStorage* storage;
 
+    void LoadSettings();
+    void LoadState();
+
     public:
     int Init(KeyStorage* storage);
 

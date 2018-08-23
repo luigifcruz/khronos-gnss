@@ -20,7 +20,7 @@ void app_main() {
     HttpServer web;
     FlashStorage flash;
     MdnsResponder mdns;
-    WebSockets socks;
+    WebSockets ws;
     Database db;
     
     keys.Init();
@@ -31,7 +31,7 @@ void app_main() {
     wifi.Init();
     
     web.Init();
-    socks.Init();
+    ws.Init(&db);
 
     printf("Trying to read the value!\n");
     uint32_t read = keys.ReadU32("ws_update_rate");

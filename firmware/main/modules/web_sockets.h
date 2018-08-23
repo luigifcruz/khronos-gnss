@@ -14,10 +14,19 @@
 #include "cJSON.h"
 
 #include "websocket_server.h"
+#include "database.h"
 
 class WebSockets {
+    private:
+    Database* db;
+
+    static void ServerHandleQueue(void* taskStartParameters);
+    static void ServerHandleTask(void* pvParameters);
+    static void HttpServe(struct netconn *conn, void* task);
+    static void WebSocketCallback(uint8_t num, WEBSOCKET_TYPE_t type, char* msg, uint64_t len, void* parameter);
+
     public:
-    int Init();
+    int Init(Database* db);
 };
 
 #endif
