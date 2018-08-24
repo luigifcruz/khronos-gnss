@@ -14,17 +14,17 @@ typedef struct {
 
 typedef struct {
     uint16_t ws_update_rate;
+    uint16_t led_status;
 } Settings;
 
-typedef void (*SocketNotifier)(char* key, char* zone, char* value);
-typedef void (*ApplicationNotifier)(char* key, char* zone, void* value);
+typedef char* (*Notifier)(char* key, char* zone, char* method, void*);
 
 class Database {
     private:
     Settings settings;
     State state;
     KeyStorage* storage;
-    SocketNotifier snf;
+    Notifier snf;
 
     void LoadSettings();
     void LoadState();
@@ -38,7 +38,7 @@ class Database {
     void UpdateSettings(Settings data);
     void UpdateState(State data);
 
-    void RegisterSocketNotifier(SocketNotifier snf);
+    void RegisterSocketNotifier(Notifier snf);
 };
 
 #endif

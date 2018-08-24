@@ -1,13 +1,6 @@
 #include "database.h"
 
-char* ConvertToString(uint16_t dat) {
-    static char *p,buf[10];
-    sprintf(buf, "%d", (int)dat);
-    p = buf;
-    return p;
-}
-
-void Database::RegisterSocketNotifier(SocketNotifier snf) {
+void Database::RegisterSocketNotifier(Notifier snf) {
     ESP_LOGI(CONFIG_SN, "[DATABASE] WebSocket Notifier Registered!");
     this->snf = snf;
 }
@@ -24,7 +17,13 @@ void Database::UpdateSettings(Settings data) {
     if (data.ws_update_rate != this->settings.ws_update_rate) {
         storage->WriteU32("ws_update_rate", data.ws_update_rate);
         memcpy(&this->settings.ws_update_rate, &data.ws_update_rate, sizeof(Settings));
-        this->snf("ws_update_rate", "settings", ConvertToString(this->settings.ws_update_rate));
+        this->snf("ws_update_rate", "settings", "broadcast", this);
+    }
+
+    if (data.led_status != this->settings.led_status) {
+        storage->WriteU32("led_status", data.led_status);
+        memcpy(&this->settings.led_status, &data.led_status, sizeof(Settings));
+        this->snf("led_status", "settings", "broadcast", this);
     }
 };
 
@@ -34,10 +33,10 @@ void Database::UpdateState(State data) {
 
 void Database::LoadSettings() {
     this->settings.ws_update_rate = storage->ReadU32("ws_update_rate");
+    this->settings.ws_update_rate = storage->ReadU32("led_status");
 }
 
 void Database::LoadState() {
-    
 }
 
 Database::Database(KeyStorage* storage) {

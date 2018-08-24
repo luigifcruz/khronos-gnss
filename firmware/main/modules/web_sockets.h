@@ -25,11 +25,12 @@ class WebSockets {
     static void HttpServe(struct netconn *conn, WebSockets* that);
     static void WebSocketCallback(uint8_t num, WEBSOCKET_TYPE_t type, char* msg, uint64_t len, void* parameter);
     static char* HandleRequest(uint8_t num,  char* msg, uint64_t len, Database* db);
+    static void AddUpdate(char* key, char* zone, char* value, cJSON* dest);
     
     public:
     WebSockets(Database* db);
     static void Broadcast(char* msg);
-    static void Notifier(char* key, char* zone, char* value);
+    static char* Notifier(char* key, char* zone, char* method, void* parameter);
 };
 
 #endif

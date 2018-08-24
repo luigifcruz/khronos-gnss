@@ -3,7 +3,25 @@
 static QueueHandle_t client_queue;
 const static int client_queue_size = 10;
 
-void WebSockets::Notifier(char* key, char* zone, char* value) {
+char* ConvertToString(uint16_t dat) {
+    static char *p,buf[10];
+    sprintf(buf, "%d", (int)dat);
+    p = buf;
+    return p;
+}
+
+void WebSockets::AddUpdate(char* key, char* zone, char* value, cJSON* dest) {
+    cJSON *key_changes = cJSON_CreateObject();
+
+    cJSON_AddStringToObject(key_changes, "key", key);
+    cJSON_AddStringToObject(key_changes, "zone", zone);
+    cJSON_AddStringToObject(key_changes, "value", value);
+
+    cJSON_AddItemToArray(dest, key_changes);
+}
+
+char* WebSockets::Notifier(char* key, char* zone, char* method, void* parameter) {
+    Database* db = (Database*)parameter;
     cJSON *broadcast, *changes;
 
 	broadcast = cJSON_CreateObject();	
@@ -12,45 +30,50 @@ void WebSockets::Notifier(char* key, char* zone, char* value) {
 
     changes = cJSON_AddArrayToObject(broadcast, "changes");
 
-    const char* settings_keys[] = {"ws_update_rate"};
-    const char* state_keys[] = {};
-
-    if (strstr(zone, "settings")) {
-        for (int i=0; i < (sizeof(settings_keys) / sizeof(settings_keys[0])); i++) {
-            if (strstr((const char*)key, settings_keys[i])) {
-                cJSON *key_changes = cJSON_CreateObject();
-
-                cJSON_AddStringToObject(key_changes, "zone", "settings");
-                cJSON_AddStringToObject(key_changes, "key", key);
-                cJSON_AddStringToObject(key_changes, "value", value);
-
-                cJSON_AddItemToArray(changes, key_changes);
-            }
+    if (strstr(zone, "settings") || (zone && !zone[0])) {
+        if (strstr(key, "ws_update_rate") || (key && !key[0])) {
+            WebSockets::AddUpdate("ws_update_rate", "settings", ConvertToString(db->GetSettings().ws_update_rate), changes);
+        }
+        if (strstr(key, "led_status") || (key && !key[0])) {
+            WebSockets::AddUpdate("led_status", "settings", ConvertToString(db->GetSettings().led_status), changes);
         }
     }
     
-    if (strstr(zone, "state")) {
-        for (int i=0; i < (sizeof(state_keys) / sizeof(state_keys[0])); i++) {
-            if (strstr((const char*)key, state_keys[i])) {
-                cJSON *key_changes = cJSON_CreateObject();
+    if (strstr(zone, "state") || (zone && !zone[0])) {
 
-                cJSON_AddStringToObject(key_changes, "zone", "state");
-                cJSON_AddStringToObject(key_changes, "key", key);
-                cJSON_AddStringToObject(key_changes, "value", value);
-
-                cJSON_AddItemToArray(changes, key_changes);
-            }
-        }
     }
 
     char* res = cJSON_Print(broadcast);
-    ws_server_send_text_all(res, strlen(res));
+    if (strstr(method, "broadcast")) {
+        ws_server_send_text_all(res, strlen(res));
+    }
+    return res;
 }
 
 char* WebSockets::HandleRequest(uint8_t num,  char* msg, uint64_t len, Database* db) {
-    printf("Function Called (%d).\n", (int)db);
-    printf("VALUE ISSS: %d\n", db->GetSettings().ws_update_rate);
-    return "yomamma";
+    char* res = "ok";
+
+    cJSON *req = cJSON_Parse(msg);
+    if (req != NULL) {
+        char* method = cJSON_GetObjectItemCaseSensitive(req, "method")->valuestring;
+
+        if (strstr(method, "get_settings")) {
+            res = Notifier("", "settings", "callback", db);
+        }
+        if (strstr(method, "get_state")) {
+            res = Notifier("", "state", "callback", db);
+        }
+
+        ws_server_send_text_client_from_callback(num, res, strlen(res)); 
+
+        if (strstr(method, "set_led")) {
+            Settings s = db->GetSettings();
+            s.led_status = 2000;
+            db->UpdateSettings(s);
+        }
+    }
+    
+    return res;
 }
 
 void WebSockets::Broadcast(char* msg) {
@@ -83,8 +106,7 @@ void WebSockets::WebSocketCallback(uint8_t num, WEBSOCKET_TYPE_t type, char* msg
             ESP_LOGI(CONFIG_SN, "[SOCKET] Client #%d responded to the ping.", num);
             break;
         case WEBSOCKET_TEXT:
-            char* res = WebSockets::HandleRequest(num, msg, len, db);
-            ws_server_send_text_client_from_callback(num, res, strlen(res));
+            WebSockets::HandleRequest(num, msg, len, db);
             break;
     }
 }
