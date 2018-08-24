@@ -9,13 +9,20 @@
 #include "modules/mdns_responder.h"
 #include "modules/web_sockets.h"
 #include "modules/database.h"
+#include "driver/gpio.h"
 
 extern "C" {
     void app_main();
 }
 
+static void LedNotifier(char* key, char* zone, void* value) {
+    uint16_t* lvl = (uint16_t*)value;
+    printf("LED UPDATE CALLED %d\n", (uint32_t)*lvl);
+    gpio_set_level(GPIO_NUM_2, (uint32_t)*lvl);
+}
+
 void app_main() {
-    KeyStorage keys;
+    static KeyStorage keys;
     static Database db(&keys);
 
     FlashStorage flash;
@@ -25,6 +32,17 @@ void app_main() {
     HttpServer web;
     WebSockets ws(&db);
 
+    db.RegisterNotifier(LedNotifier);
+
+    gpio_pad_select_gpio(GPIO_NUM_2);
+    gpio_set_direction(GPIO_NUM_2, GPIO_MODE_OUTPUT);
+
+    ESP_LOGI(CONFIG_SN, "[MAIN] Loading state and settings...");
+    db.LoadSettings();
+    db.LoadState();
+    ESP_LOGI(CONFIG_SN, "[MAIN] Load Done!");
+
+/*
     uint32_t up = 200;
     while(1) {
         Settings s = db.GetSettings();
@@ -33,4 +51,5 @@ void app_main() {
 
         vTaskDelay(10000 / portTICK_PERIOD_MS);
     }
+*/
 }

@@ -20,13 +20,13 @@ void WebSockets::AddKey(char* key, char* zone, char* value, cJSON* dest) {
     cJSON_AddItemToArray(dest, key_changes);
 }
 
-char* WebSockets::Responder(void* parameter) {
+char* WebSockets::BulkResponder(void* parameter) {
     Database* db = (Database*)parameter;
     cJSON *broadcast, *changes;
 
 	broadcast = cJSON_CreateObject();	
 	cJSON_AddItemToObject(broadcast, "type", cJSON_CreateString("broadcast"));
-    cJSON_AddItemToObject(broadcast, "method", cJSON_CreateString("delta_update"));
+    cJSON_AddItemToObject(broadcast, "method", cJSON_CreateString("bulk_update"));
 
     changes = cJSON_AddArrayToObject(broadcast, "changes");
 
@@ -37,7 +37,7 @@ char* WebSockets::Responder(void* parameter) {
 }
 
 void WebSockets::HandleRequest(uint8_t num,  char* msg, uint64_t len, Database* db) {
-    char* res = "ok";
+    char* res = NULL;
 
     cJSON *req = cJSON_Parse(msg);
     if (req != NULL) {
@@ -46,17 +46,25 @@ void WebSockets::HandleRequest(uint8_t num,  char* msg, uint64_t len, Database* 
 
         if (strstr(method, "get")) {
             if (strstr(target, "data")) {
-                res = Responder(db);
+                res = BulkResponder(db);
             }
         }
 
         if (strstr(method, "set")) {
             int value = cJSON_GetObjectItemCaseSensitive(req, "value")->valueint;
 
-            if (strstr(target, "led")) {
+            if (strstr(target, "led_on")) {
                 Settings s = db->GetSettings();
-                s.led_status = (uint16_t)value;
+                s.led_status = 0x0001;
                 db->UpdateSettings(s);
+                res = BulkResponder(db);
+            }
+
+            if (strstr(target, "led_off")) {
+                Settings s = db->GetSettings();
+                s.led_status = 0x0000;
+                db->UpdateSettings(s);
+                res = BulkResponder(db);
             }
         }
     }

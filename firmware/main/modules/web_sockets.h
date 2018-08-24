@@ -27,7 +27,7 @@ class WebSockets {
     static void HandleRequest(uint8_t num,  char* msg, uint64_t len, Database* db);
 
     static void AddKey(char* key, char* zone, char* value, cJSON* dest);
-    static char* Responder(void* parameter);
+    static char* BulkResponder(void* parameter);
     
     public:
     WebSockets(Database* db);

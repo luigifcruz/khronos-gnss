@@ -17,16 +17,14 @@ typedef struct {
     uint16_t led_status;
 } Settings;
 
-typedef char* (*Notifier)(char* key, char* zone, char* method, void*);
+typedef void (*Notifier)(char* key, char* zone, void* value);
 
 class Database {
     private:
     Settings settings;
     State state;
     KeyStorage* storage;
-
-    void LoadSettings();
-    void LoadState();
+    Notifier nf;
 
     public:
     Database(KeyStorage* storage);
@@ -36,6 +34,11 @@ class Database {
 
     void UpdateSettings(Settings data);
     void UpdateState(State data);
+
+    void LoadSettings();
+    void LoadState();
+
+    void RegisterNotifier(Notifier nf);
 };
 
 #endif

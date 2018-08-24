@@ -10,13 +10,14 @@ State Database::GetState() {
 
 void Database::UpdateSettings(Settings data) {
     if (data.ws_update_rate != this->settings.ws_update_rate) {
-        storage->WriteU32("ws_update_rate", data.ws_update_rate);
-        memcpy(&this->settings.ws_update_rate, &data.ws_update_rate, sizeof(Settings));
+        storage->WriteU16("ws_update_rate", data.ws_update_rate);
+        memcpy(&this->settings.ws_update_rate, &data.ws_update_rate, sizeof(uint16_t));
     }
 
     if (data.led_status != this->settings.led_status) {
-        storage->WriteU32("led_status", data.led_status);
-        memcpy(&this->settings.led_status, &data.led_status, sizeof(Settings));
+        storage->WriteU16("led_status", data.led_status);
+        memcpy(&this->settings.led_status, &data.led_status, sizeof(uint16_t));
+        this->nf("led_status", "settings", &this->settings.led_status);
     }
 };
 
@@ -25,16 +26,23 @@ void Database::UpdateState(State data) {
 };
 
 void Database::LoadSettings() {
-    this->settings.ws_update_rate = storage->ReadU32("ws_update_rate");
-    this->settings.ws_update_rate = storage->ReadU32("led_status");
+    Settings s;
+    memset(&s, 0, sizeof(s));
+    
+    s.ws_update_rate = storage->ReadU16("ws_update_rate");
+    s.led_status = storage->ReadU16("led_status");
+
+    this->UpdateSettings(s);
 }
 
 void Database::LoadState() {
 }
 
+void Database::RegisterNotifier(Notifier nf) {
+    ESP_LOGI(CONFIG_SN, "[DATABASE] New notifier registered.");
+    this->nf = nf;
+}
+
 Database::Database(KeyStorage* storage) {
     this->storage = storage;
-
-    LoadSettings();
-    LoadState();
 }
