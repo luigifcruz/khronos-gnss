@@ -24,13 +24,13 @@ class WebSockets {
     static void ServerHandleTask(void* pvParameters);
     static void HttpServe(struct netconn *conn, WebSockets* that);
     static void WebSocketCallback(uint8_t num, WEBSOCKET_TYPE_t type, char* msg, uint64_t len, void* parameter);
-    static char* HandleRequest(uint8_t num,  char* msg, uint64_t len, Database* db);
-    static void AddUpdate(char* key, char* zone, char* value, cJSON* dest);
+    static void HandleRequest(uint8_t num,  char* msg, uint64_t len, Database* db);
+
+    static void AddKey(char* key, char* zone, char* value, cJSON* dest);
+    static char* Responder(void* parameter);
     
     public:
     WebSockets(Database* db);
-    static void Broadcast(char* msg);
-    static char* Notifier(char* key, char* zone, char* method, void* parameter);
 };
 
 #endif

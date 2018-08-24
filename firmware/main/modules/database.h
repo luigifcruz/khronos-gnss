@@ -24,7 +24,6 @@ class Database {
     Settings settings;
     State state;
     KeyStorage* storage;
-    Notifier snf;
 
     void LoadSettings();
     void LoadState();
@@ -37,8 +36,6 @@ class Database {
 
     void UpdateSettings(Settings data);
     void UpdateState(State data);
-
-    void RegisterSocketNotifier(Notifier snf);
 };
 
 #endif

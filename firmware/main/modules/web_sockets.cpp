@@ -10,7 +10,7 @@ char* ConvertToString(uint16_t dat) {
     return p;
 }
 
-void WebSockets::AddUpdate(char* key, char* zone, char* value, cJSON* dest) {
+void WebSockets::AddKey(char* key, char* zone, char* value, cJSON* dest) {
     cJSON *key_changes = cJSON_CreateObject();
 
     cJSON_AddStringToObject(key_changes, "key", key);
@@ -20,7 +20,7 @@ void WebSockets::AddUpdate(char* key, char* zone, char* value, cJSON* dest) {
     cJSON_AddItemToArray(dest, key_changes);
 }
 
-char* WebSockets::Notifier(char* key, char* zone, char* method, void* parameter) {
+char* WebSockets::Responder(void* parameter) {
     Database* db = (Database*)parameter;
     cJSON *broadcast, *changes;
 
@@ -30,54 +30,38 @@ char* WebSockets::Notifier(char* key, char* zone, char* method, void* parameter)
 
     changes = cJSON_AddArrayToObject(broadcast, "changes");
 
-    if (strstr(zone, "settings") || (zone && !zone[0])) {
-        if (strstr(key, "ws_update_rate") || (key && !key[0])) {
-            WebSockets::AddUpdate("ws_update_rate", "settings", ConvertToString(db->GetSettings().ws_update_rate), changes);
-        }
-        if (strstr(key, "led_status") || (key && !key[0])) {
-            WebSockets::AddUpdate("led_status", "settings", ConvertToString(db->GetSettings().led_status), changes);
-        }
-    }
-    
-    if (strstr(zone, "state") || (zone && !zone[0])) {
+    WebSockets::AddKey("ws_update_rate", "settings", ConvertToString(db->GetSettings().ws_update_rate), changes);
+    WebSockets::AddKey("led_status", "settings", ConvertToString(db->GetSettings().led_status), changes);
 
-    }
-
-    char* res = cJSON_Print(broadcast);
-    if (strstr(method, "broadcast")) {
-        ws_server_send_text_all(res, strlen(res));
-    }
-    return res;
+    return cJSON_Print(broadcast);
 }
 
-char* WebSockets::HandleRequest(uint8_t num,  char* msg, uint64_t len, Database* db) {
+void WebSockets::HandleRequest(uint8_t num,  char* msg, uint64_t len, Database* db) {
     char* res = "ok";
 
     cJSON *req = cJSON_Parse(msg);
     if (req != NULL) {
         char* method = cJSON_GetObjectItemCaseSensitive(req, "method")->valuestring;
+        char* target = cJSON_GetObjectItemCaseSensitive(req, "target")->valuestring;
 
-        if (strstr(method, "get_settings")) {
-            res = Notifier("", "settings", "callback", db);
+        if (strstr(method, "get")) {
+            if (strstr(target, "data")) {
+                res = Responder(db);
+            }
         }
-        if (strstr(method, "get_state")) {
-            res = Notifier("", "state", "callback", db);
-        }
 
-        ws_server_send_text_client_from_callback(num, res, strlen(res)); 
+        if (strstr(method, "set")) {
+            int value = cJSON_GetObjectItemCaseSensitive(req, "value")->valueint;
 
-        if (strstr(method, "set_led")) {
-            Settings s = db->GetSettings();
-            s.led_status = 2000;
-            db->UpdateSettings(s);
+            if (strstr(target, "led")) {
+                Settings s = db->GetSettings();
+                s.led_status = (uint16_t)value;
+                db->UpdateSettings(s);
+            }
         }
     }
     
-    return res;
-}
-
-void WebSockets::Broadcast(char* msg) {
-    ws_server_send_text_all(msg, strlen(msg));
+    ws_server_send_text_client_from_callback(num, res, strlen(res)); 
 }
 
 void WebSockets::WebSocketCallback(uint8_t num, WEBSOCKET_TYPE_t type, char* msg, uint64_t len, void* parameter) {
@@ -173,7 +157,6 @@ WebSockets::WebSockets(Database* db) {
     ESP_LOGI(CONFIG_SN, "[SOCKETS] Service Stated...");
 
     this->db = db;
-    this->db->RegisterSocketNotifier(&this->Notifier);    
 
     ws_server_start(db);
     xTaskCreate(WebSockets::ServerHandleTask, "ServerHandleTask", 3000, this, 9, NULL);
