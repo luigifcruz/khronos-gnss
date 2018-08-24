@@ -10,7 +10,7 @@
 
 class MdnsResponder {
     public:
-    int Init();
+    MdnsResponder();
 };
 
 #endif

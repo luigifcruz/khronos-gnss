@@ -16,24 +16,21 @@ extern "C" {
 
 void app_main() {
     KeyStorage keys;
-    Wireless wifi;
-    HttpServer web;
+    static Database db(&keys);
+
     FlashStorage flash;
     MdnsResponder mdns;
-    WebSockets ws;
-    static Database db;
+    Wireless wifi;
     
-    keys.Init();
-    db.Init(&keys);
+    HttpServer web;
+    WebSockets ws(&db);
 
-    flash.Init();
-    mdns.Init();
-    wifi.Init();
-    
-    web.Init();
-    ws.Init(&db);
+    uint32_t up = 200;
+    while(1) {
+        Settings s = db.GetSettings();
+        s.ws_update_rate = up++;
+        db.UpdateSettings(s);
 
-    printf("Trying to read the value!\n");
-    uint32_t read = keys.ReadU32("ws_update_rate");
-    printf("Operation exited with %d\n", read);
+        vTaskDelay(10000 / portTICK_PERIOD_MS);
+    }
 }

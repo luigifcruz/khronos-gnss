@@ -29,7 +29,7 @@ int KeyStorage::Commit() {
     return 0;
 }
 
-int KeyStorage::Init() {
+KeyStorage::KeyStorage() {
     ESP_LOGI(CONFIG_SN, "[NVS] Service Stated...");
 
     this->ret = nvs_flash_init();
@@ -42,8 +42,5 @@ int KeyStorage::Init() {
     this->ret = nvs_open("storage", NVS_READWRITE, &this->handle);
     if (this->ret != ESP_OK) {
         ESP_LOGE(CONFIG_SN, "[NVS] Error opening NVS handle!");
-        return 1;
     }
-    
-    return 0;
 }

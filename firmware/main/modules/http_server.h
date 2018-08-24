@@ -16,7 +16,7 @@ class HttpServer {
     httpd_handle_t server = NULL;
 
     public:
-    int Init();
+    HttpServer();
     void Stop();
 };
 

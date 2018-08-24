@@ -16,7 +16,7 @@ class Wireless {
     static esp_err_t EventHandler(void *ctx, system_event_t *event);
 
     public:
-    int Init();
+    Wireless();
 };
 
 #endif

@@ -16,23 +16,29 @@ typedef struct {
     uint16_t ws_update_rate;
 } Settings;
 
+typedef void (*SocketNotifier)(char* key, char* zone, char* value);
+typedef void (*ApplicationNotifier)(char* key, char* zone, void* value);
+
 class Database {
     private:
     Settings settings;
     State state;
     KeyStorage* storage;
+    SocketNotifier snf;
 
     void LoadSettings();
     void LoadState();
 
     public:
-    int Init(KeyStorage* storage);
+    Database(KeyStorage* storage);
 
     Settings GetSettings();
     State GetState();
 
     void UpdateSettings(Settings data);
     void UpdateState(State data);
+
+    void RegisterSocketNotifier(SocketNotifier snf);
 };
 
 #endif

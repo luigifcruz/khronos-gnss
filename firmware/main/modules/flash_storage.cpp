@@ -5,7 +5,7 @@ void FlashStorage::Close() {
     esp_vfs_spiffs_unregister(NULL);
 }
 
-int FlashStorage::Init() {
+FlashStorage::FlashStorage() {
     esp_vfs_spiffs_conf_t conf = {
       .base_path = "/spiffs",
       .partition_label = NULL,
@@ -23,7 +23,6 @@ int FlashStorage::Init() {
         } else {
             ESP_LOGE(CONFIG_SN, "[FLASH_FS] Failed to initialize SPIFFS (%s).", esp_err_to_name(ret));
         }
-        return 1;
     }
     
     size_t total = 0, used = 0;
@@ -33,6 +32,4 @@ int FlashStorage::Init() {
     } else {
         ESP_LOGI(CONFIG_SN, "[FLASH_FS] Partition size: total: %d, used: %d.", total, used);
     }
-    
-    return 0;
 }

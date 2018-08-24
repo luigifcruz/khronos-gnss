@@ -3,9 +3,58 @@
 static QueueHandle_t client_queue;
 const static int client_queue_size = 10;
 
-void HandleRequest(uint8_t num,  char* msg, uint64_t len, Database* db) {
+void WebSockets::Notifier(char* key, char* zone, char* value) {
+    cJSON *broadcast, *changes;
+
+	broadcast = cJSON_CreateObject();	
+	cJSON_AddItemToObject(broadcast, "type", cJSON_CreateString("broadcast"));
+    cJSON_AddItemToObject(broadcast, "method", cJSON_CreateString("delta_update"));
+
+    changes = cJSON_AddArrayToObject(broadcast, "changes");
+
+    const char* settings_keys[] = {"ws_update_rate"};
+    const char* state_keys[] = {};
+
+    if (strstr(zone, "settings")) {
+        for (int i=0; i < (sizeof(settings_keys) / sizeof(settings_keys[0])); i++) {
+            if (strstr((const char*)key, settings_keys[i])) {
+                cJSON *key_changes = cJSON_CreateObject();
+
+                cJSON_AddStringToObject(key_changes, "zone", "settings");
+                cJSON_AddStringToObject(key_changes, "key", key);
+                cJSON_AddStringToObject(key_changes, "value", value);
+
+                cJSON_AddItemToArray(changes, key_changes);
+            }
+        }
+    }
+    
+    if (strstr(zone, "state")) {
+        for (int i=0; i < (sizeof(state_keys) / sizeof(state_keys[0])); i++) {
+            if (strstr((const char*)key, state_keys[i])) {
+                cJSON *key_changes = cJSON_CreateObject();
+
+                cJSON_AddStringToObject(key_changes, "zone", "state");
+                cJSON_AddStringToObject(key_changes, "key", key);
+                cJSON_AddStringToObject(key_changes, "value", value);
+
+                cJSON_AddItemToArray(changes, key_changes);
+            }
+        }
+    }
+
+    char* res = cJSON_Print(broadcast);
+    ws_server_send_text_all(res, strlen(res));
+}
+
+char* WebSockets::HandleRequest(uint8_t num,  char* msg, uint64_t len, Database* db) {
     printf("Function Called (%d).\n", (int)db);
     printf("VALUE ISSS: %d\n", db->GetSettings().ws_update_rate);
+    return "yomamma";
+}
+
+void WebSockets::Broadcast(char* msg) {
+    ws_server_send_text_all(msg, strlen(msg));
 }
 
 void WebSockets::WebSocketCallback(uint8_t num, WEBSOCKET_TYPE_t type, char* msg, uint64_t len, void* parameter) {
@@ -34,12 +83,13 @@ void WebSockets::WebSocketCallback(uint8_t num, WEBSOCKET_TYPE_t type, char* msg
             ESP_LOGI(CONFIG_SN, "[SOCKET] Client #%d responded to the ping.", num);
             break;
         case WEBSOCKET_TEXT:
-            HandleRequest(num, msg, len, db);
+            char* res = WebSockets::HandleRequest(num, msg, len, db);
+            ws_server_send_text_client_from_callback(num, res, strlen(res));
             break;
     }
 }
 
-void WebSockets::HttpServe(struct netconn *conn) {
+void WebSockets::HttpServe(struct netconn *conn, WebSockets* that) {
     struct netbuf* inbuf;
     static char* buf;
     static uint16_t buflen;
@@ -52,7 +102,7 @@ void WebSockets::HttpServe(struct netconn *conn) {
         netbuf_data(inbuf, (void**)&buf, &buflen);
 
         if (buf && strstr(buf,"GET / ") && strstr(buf,"Upgrade: websocket")) {
-            ws_server_add_client(conn, buf, buflen, "/", WebSockets::WebSocketCallback);
+            ws_server_add_client(conn, buf, buflen, "/", that->WebSocketCallback);
             netbuf_delete(inbuf);
         } else {
             ESP_LOGW(CONFIG_SN, "[SOCKETS] Bad request, dropping...");
@@ -92,18 +142,18 @@ void WebSockets::ServerHandleQueue(void* pvParameters) {
     while (1) {
         xQueueReceive(client_queue, &conn, portMAX_DELAY);
         if(!conn) continue;
-        HttpServe(conn);
+        HttpServe(conn, ((WebSockets*)pvParameters));
     }
     vTaskDelete(NULL);
 }
 
-int WebSockets::Init(Database* db) {
-    this->db = db;
+WebSockets::WebSockets(Database* db) {
     ESP_LOGI(CONFIG_SN, "[SOCKETS] Service Stated...");
+
+    this->db = db;
+    this->db->RegisterSocketNotifier(&this->Notifier);    
 
     ws_server_start(db);
     xTaskCreate(WebSockets::ServerHandleTask, "ServerHandleTask", 3000, this, 9, NULL);
     xTaskCreate(WebSockets::ServerHandleQueue, "ServerHandleQueue", 4000, this, 6, NULL);
-
-    return 0;
 }

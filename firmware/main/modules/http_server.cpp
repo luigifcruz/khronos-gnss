@@ -92,7 +92,7 @@ void HttpServer::Stop() {
     httpd_stop(this->server);
 }
 
-int HttpServer::Init() {
+HttpServer::HttpServer() {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 
     ESP_LOGI(CONFIG_SN, "[HTTP] Service stated on port: %d", config.server_port);
@@ -104,9 +104,7 @@ int HttpServer::Init() {
         httpd_register_uri_handler(server, &clock);
         httpd_register_uri_handler(server, &gnss);
         httpd_register_uri_handler(server, &file);
-        return 1;
     }
 
     ESP_LOGI(CONFIG_SN, "[HTTP] Error starting HTTP server!");
-    return 0;
 }

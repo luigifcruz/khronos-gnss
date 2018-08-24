@@ -14,7 +14,7 @@ class KeyStorage {
     int CheckError();
 
     public:
-    int Init();
+    KeyStorage();
 
     int WriteU32(const char* key, uint32_t num);
     uint32_t ReadU32(const char* key);

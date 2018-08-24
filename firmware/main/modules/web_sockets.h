@@ -22,12 +22,14 @@ class WebSockets {
 
     static void ServerHandleQueue(void* pvParameters);
     static void ServerHandleTask(void* pvParameters);
-    static void HttpServe(struct netconn *conn);
+    static void HttpServe(struct netconn *conn, WebSockets* that);
     static void WebSocketCallback(uint8_t num, WEBSOCKET_TYPE_t type, char* msg, uint64_t len, void* parameter);
-    //void HandleRequest(uint8_t num,  char* msg, uint64_t len, Database* db);
-
+    static char* HandleRequest(uint8_t num,  char* msg, uint64_t len, Database* db);
+    
     public:
-    int Init(Database* db);
+    WebSockets(Database* db);
+    static void Broadcast(char* msg);
+    static void Notifier(char* key, char* zone, char* value);
 };
 
 #endif

@@ -25,7 +25,7 @@ esp_err_t Wireless::EventHandler(void *ctx, system_event_t *event) {
     return ESP_OK;
 }
 
-int Wireless::Init() {
+Wireless::Wireless() {
     wifi_event_group = xEventGroupCreate();
 
     tcpip_adapter_init();
@@ -43,6 +43,4 @@ int Wireless::Init() {
     ESP_ERROR_CHECK(esp_wifi_start());
 
     ESP_LOGI(CONFIG_SN, "[WIRELESS] Settings SSID: %s", CONFIG_WIFI_SSID);
-
-    return 1;
 }

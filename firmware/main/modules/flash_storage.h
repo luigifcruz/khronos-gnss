@@ -11,7 +11,7 @@
 
 class FlashStorage {
     public:
-    int Init();
+    FlashStorage();
     void Close();
 };
 
