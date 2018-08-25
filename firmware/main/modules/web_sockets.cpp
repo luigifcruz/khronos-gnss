@@ -14,22 +14,50 @@ void WebSockets::AddKey(char* key, char* zone, char* value, cJSON* dest) {
     cJSON_AddItemToArray(dest, key_changes);
 }
 
-char* WebSockets::BulkResponder(void* parameter) {
-    Database* db = (Database*)parameter;
+char* WebSockets::CompileUpdate(char* key, char* zone, Database* db) {
     cJSON *res, *changes;
 
 	res = cJSON_CreateObject();	
 	cJSON_AddItemToObject(res, "type", cJSON_CreateString("broadcast"));
-    cJSON_AddItemToObject(res, "method", cJSON_CreateString("bulk_update"));
 
+    if ((zone && !zone[0]) || (key && !key[0])) {
+        cJSON_AddItemToObject(res, "method", cJSON_CreateString("bulk_update"));
+    } else {
+        cJSON_AddItemToObject(res, "method", cJSON_CreateString("delta_update"));
+    }
+    
     changes = cJSON_AddArrayToObject(res, "changes");
 
-    WebSockets::AddKey((char*)"ws_update_rate", (char*)"settings", (char*)std::to_string(db->GetSettings().ws_update_rate).c_str(), changes);
-    WebSockets::AddKey((char*)"led_status", (char*)"settings", (char*)std::to_string(db->GetSettings().led_status).c_str(), changes);
+    if (strstr(zone, "settings") || (zone && !zone[0])) {
+        if (strstr(key, "ws_update_rate") || (key && !key[0])) {
+            WebSockets::AddKey((char*)"ws_update_rate", (char*)"settings", (char*)std::to_string(db->GetSettings().ws_update_rate).c_str(), changes);
+        }
+        if (strstr(key, "led_status") || (key && !key[0])) {
+            WebSockets::AddKey((char*)"led_status", (char*)"settings", (char*)std::to_string(db->GetSettings().led_status).c_str(), changes);
+        }
+    }
+    
+    if (strstr(zone, "state") || (zone && !zone[0])) {
 
-    char* res_string = cJSON_Print(res);
-    ws_server_send_text_all_from_callback(res_string, strlen(res_string));
-    return res_string;
+    }
+
+    return cJSON_Print(res);
+}
+
+char* WebSockets::BulkResponder(void* parameter, bool broadcast) {
+    Database* db = (Database*)parameter;
+
+    char* res = WebSockets::CompileUpdate((char*)"", (char*)"", db);
+
+    if (broadcast) {
+        ws_server_send_text_all_from_callback(res, strlen(res));
+    }
+    return res;
+}
+
+void WebSockets::DeltaResponder(char* key, char* zone, void* value) {
+    char* delta = WebSockets::CompileUpdate(key, zone, ((Database*)value));
+    ws_server_send_text_all_from_callback(delta, strlen(delta));
 }
 
 char* WebSockets::HandleRequest(cJSON* req, void* parameter) {
@@ -42,7 +70,7 @@ char* WebSockets::HandleRequest(cJSON* req, void* parameter) {
 
         if (strstr(method, "get")) {
             if (strstr(target, "data")) {
-                res = BulkResponder(db);
+                res = BulkResponder(db, true);
             }
         }
 
@@ -53,14 +81,14 @@ char* WebSockets::HandleRequest(cJSON* req, void* parameter) {
                 Settings s = db->GetSettings();
                 s.led_status = 0x0001;
                 db->UpdateSettings(s);
-                res = BulkResponder(db);
+                res = BulkResponder(db, false);
             }
 
             if (strstr(target, "led_off")) {
                 Settings s = db->GetSettings();
                 s.led_status = 0x0000;
                 db->UpdateSettings(s);
-                res = BulkResponder(db);
+                res = BulkResponder(db, false);
             }
         }
     }
@@ -117,10 +145,12 @@ void WebSockets::HttpServe(struct netconn *conn, void* parameter) {
             str = str.substr(0, buflen);
 
             cJSON *req = cJSON_Parse(str.substr(str.find("\r\n\r\n")).erase(0, 4).c_str());
-            char* res = WebSockets::HandleRequest(req, parameter);
 
-            netconn_write(conn, http_hdr, strlen(http_hdr), NETCONN_NOCOPY);
-            netconn_write(conn, res, strlen(res), NETCONN_NOCOPY);
+            if (req != NULL) {
+                char* res = WebSockets::HandleRequest(req, parameter);
+                netconn_write(conn, http_hdr, strlen(http_hdr), NETCONN_NOCOPY);
+                netconn_write(conn, res, strlen(res), NETCONN_NOCOPY);
+            }
 
             netconn_close(conn);
             netconn_delete(conn);
@@ -172,6 +202,7 @@ WebSockets::WebSockets(Database* db) {
     ESP_LOGI(CONFIG_SN, "[SOCKETS] Service Stated...");
 
     this->db = db;
+    this->db->RegisterNotifier((char*)"socket", &this->DeltaResponder);
 
     ws_server_start(db);
     xTaskCreate(WebSockets::ServerHandleTask, "ServerHandleTask", 3000, db, 9, NULL);

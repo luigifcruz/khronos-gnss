@@ -28,10 +28,12 @@ class WebSockets {
     static char* HandleRequest(cJSON* msg, void* parameter);
 
     static void AddKey(char* key, char* zone, char* value, cJSON* dest);
-    static char* BulkResponder(void* parameter);
+    static char* BulkResponder(void* parameter, bool broadcast);
+    static char* CompileUpdate(char* key, char* zone, Database* db);
     
     public:
     WebSockets(Database* db);
+    static void DeltaResponder(char* key, char* zone, void* value);
 };
 
 #endif

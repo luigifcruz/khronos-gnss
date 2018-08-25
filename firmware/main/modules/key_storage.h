@@ -22,6 +22,9 @@ class KeyStorage {
     int WriteU16(const char* key, uint16_t num);
     uint16_t ReadU16(const char* key);
 
+    int WriteU8(const char* key, uint8_t num);
+    uint8_t ReadU8(const char* key);
+
     int Commit();
 };
 

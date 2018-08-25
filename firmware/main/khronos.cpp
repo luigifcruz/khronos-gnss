@@ -31,7 +31,7 @@ void app_main() {
     HttpServer web;
     WebSockets ws(&db);
 
-    db.RegisterNotifier(LedNotifier);
+    db.RegisterNotifier((char*)"led", LedNotifier);
 
     gpio_pad_select_gpio(GPIO_NUM_2);
     gpio_set_direction(GPIO_NUM_2, GPIO_MODE_OUTPUT);
@@ -39,7 +39,6 @@ void app_main() {
     ESP_LOGI(CONFIG_SN, "[MAIN] Loading state and settings...");
     db.LoadSettings();
     db.LoadState();
-    ESP_LOGI(CONFIG_SN, "[MAIN] Load Done!");
 
 /*
     uint32_t up = 200;

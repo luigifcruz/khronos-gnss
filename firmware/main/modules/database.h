@@ -27,6 +27,7 @@ class Database {
     bool SettingsLoaded = false;
     
     Notifier nf;
+    Notifier snf;
 
     public:
     Database(KeyStorage* storage);
@@ -40,7 +41,7 @@ class Database {
     void LoadSettings();
     void LoadState();
 
-    void RegisterNotifier(Notifier nf);
+    void RegisterNotifier(char* key, Notifier nf);
 };
 
 #endif

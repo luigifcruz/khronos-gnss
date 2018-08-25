@@ -32,6 +32,18 @@ uint16_t KeyStorage::ReadU16(const char* key) {
     return buf;
 }
 
+int KeyStorage::WriteU8(const char* key, uint8_t num) {
+    this->ret = nvs_set_u8(this->handle, key, num);
+    return this->Commit() || CheckError();
+}
+
+uint8_t KeyStorage::ReadU8(const char* key) {
+    uint8_t buf = 0;
+    this->ret = nvs_get_u8(this->handle, key, &buf);
+    CheckError();
+    return buf;
+}
+
 int KeyStorage::Commit() {
     this->ret = nvs_commit(this->handle);
     if (this->ret != ESP_OK) {
