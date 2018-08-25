@@ -17,7 +17,6 @@ extern "C" {
 
 static void LedNotifier(char* key, char* zone, void* value) {
     uint16_t* lvl = (uint16_t*)value;
-    printf("LED UPDATE CALLED %d\n", (uint32_t)*lvl);
     gpio_set_level(GPIO_NUM_2, (uint32_t)*lvl);
 }
 

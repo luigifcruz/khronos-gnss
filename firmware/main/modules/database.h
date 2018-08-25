@@ -24,6 +24,8 @@ class Database {
     Settings settings;
     State state;
     KeyStorage* storage;
+    bool SettingsLoaded = false;
+    
     Notifier nf;
 
     public:

@@ -1,7 +1,8 @@
 #ifndef WEB_SOCKETS_H
 #define WEB_SOCKETS_H
 
-#include <cstring>
+#include <string>
+#include <iostream>
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
@@ -22,9 +23,9 @@ class WebSockets {
 
     static void ServerHandleQueue(void* pvParameters);
     static void ServerHandleTask(void* pvParameters);
-    static void HttpServe(struct netconn *conn, WebSockets* that);
+    static void HttpServe(struct netconn *conn, void* that);
     static void WebSocketCallback(uint8_t num, WEBSOCKET_TYPE_t type, char* msg, uint64_t len, void* parameter);
-    static void HandleRequest(uint8_t num,  char* msg, uint64_t len, Database* db);
+    static char* HandleRequest(cJSON* msg, void* parameter);
 
     static void AddKey(char* key, char* zone, char* value, cJSON* dest);
     static char* BulkResponder(void* parameter);

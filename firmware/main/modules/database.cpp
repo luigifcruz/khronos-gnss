@@ -10,15 +10,17 @@ State Database::GetState() {
 
 void Database::UpdateSettings(Settings data) {
     if (data.ws_update_rate != this->settings.ws_update_rate) {
-        storage->WriteU16("ws_update_rate", data.ws_update_rate);
+        if (SettingsLoaded) { storage->WriteU16("ws_update_rate", data.ws_update_rate); }
         memcpy(&this->settings.ws_update_rate, &data.ws_update_rate, sizeof(uint16_t));
     }
 
     if (data.led_status != this->settings.led_status) {
-        storage->WriteU16("led_status", data.led_status);
+        if (SettingsLoaded) { storage->WriteU16("led_status", data.led_status); }
         memcpy(&this->settings.led_status, &data.led_status, sizeof(uint16_t));
-        this->nf("led_status", "settings", &this->settings.led_status);
+        this->nf((char*)"led_status", (char*)"settings", &this->settings.led_status);
     }
+
+    this->SettingsLoaded = true;
 };
 
 void Database::UpdateState(State data) {

@@ -28,6 +28,8 @@ esp_err_t Wireless::EventHandler(void *ctx, system_event_t *event) {
 Wireless::Wireless() {
     wifi_event_group = xEventGroupCreate();
 
+    esp_log_level_set("wifi", ESP_LOG_WARN);
+
     tcpip_adapter_init();
     esp_event_loop_init(this->EventHandler, this);
 
