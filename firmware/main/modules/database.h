@@ -5,7 +5,6 @@
 
 #include "esp_event_loop.h"
 #include "esp_system.h"
-
 #include "key_storage.h"
 
 typedef struct {

@@ -4,12 +4,9 @@
 #include <string>
 #include <iostream>
 
-#include "freertos/FreeRTOS.h"
-#include "esp_event_loop.h"
 #include "esp_system.h"
 #include "esp_log.h"
 #include "cJSON.h"
-
 #include "database.h"
 
 class ApiHandler {

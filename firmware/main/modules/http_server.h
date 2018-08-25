@@ -1,15 +1,13 @@
 #ifndef HTTPSERVER_H
 #define HTTPSERVER_H
 
-#include "freertos/FreeRTOS.h"
-#include "esp_system.h"
-#include "esp_log.h"
-
-#include "flash_storage.h"
-
 #include <cstring>
 #include <sys/param.h>
 #include <http_server.h>
+
+#include "flash_storage.h"
+#include "esp_system.h"
+#include "esp_log.h"
 
 #define BUF_SIZE 1024
 

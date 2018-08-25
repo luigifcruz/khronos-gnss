@@ -1,9 +1,6 @@
 #ifndef API_SERVER_H
 #define API_SERVER_H
 
-#include <string>
-#include <iostream>
-
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
 #include "freertos/task.h"
@@ -13,7 +10,6 @@
 #include "esp_system.h"
 #include "esp_log.h"
 #include "cJSON.h"
-
 #include "api_handler.h"
 #include "websocket_server.h"
 #include "database.h"
