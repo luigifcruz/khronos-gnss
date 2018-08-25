@@ -11,6 +11,8 @@
 #include <sys/param.h>
 #include <http_server.h>
 
+#define BUF_SIZE 1024
+
 class HttpServer {
     private:
     httpd_handle_t server = NULL;

@@ -7,7 +7,7 @@
 #include "modules/wireless.h"
 #include "modules/http_server.h"
 #include "modules/mdns_responder.h"
-#include "modules/web_sockets.h"
+#include "modules/api_server.h"
 #include "modules/database.h"
 #include "driver/gpio.h"
 
@@ -29,7 +29,7 @@ void app_main() {
     Wireless wifi;
     
     HttpServer web;
-    WebSockets ws(&db);
+    ApiServer ws(&db);
 
     db.RegisterNotifier((char*)"led", LedNotifier);
 

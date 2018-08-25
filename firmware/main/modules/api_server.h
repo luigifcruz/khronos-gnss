@@ -1,5 +1,5 @@
-#ifndef WEB_SOCKETS_H
-#define WEB_SOCKETS_H
+#ifndef API_SERVER_H
+#define API_SERVER_H
 
 #include <string>
 #include <iostream>
@@ -14,10 +14,14 @@
 #include "esp_log.h"
 #include "cJSON.h"
 
+#include "api_handler.h"
 #include "websocket_server.h"
 #include "database.h"
 
-class WebSockets {
+const static int client_queue_size = 10;
+const static char http_hdr[] = "HTTP/1.1 200 OK\r\nContent-type: application/json\r\n\r\n";
+
+class ApiServer {
     private:
     Database* db;
 
@@ -25,14 +29,9 @@ class WebSockets {
     static void ServerHandleTask(void* pvParameters);
     static void HttpServe(struct netconn *conn, void* that);
     static void WebSocketCallback(uint8_t num, WEBSOCKET_TYPE_t type, char* msg, uint64_t len, void* parameter);
-    static char* HandleRequest(cJSON* msg, void* parameter);
-
-    static void AddKey(char* key, char* zone, char* value, cJSON* dest);
-    static char* BulkResponder(void* parameter, bool broadcast);
-    static char* CompileUpdate(char* key, char* zone, Database* db);
     
     public:
-    WebSockets(Database* db);
+    ApiServer(Database* db);
     static void DeltaResponder(char* key, char* zone, void* value);
 };
 

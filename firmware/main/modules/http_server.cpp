@@ -1,7 +1,5 @@
 #include "http_server.h"
 
-#define BUF_SIZE 1024
-
 esp_err_t get_handler(httpd_req_t *req) {
     FILE *file = NULL;
     char file_buffer[BUF_SIZE];
