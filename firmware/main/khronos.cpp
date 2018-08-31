@@ -38,15 +38,4 @@ void app_main() {
     ESP_LOGI(CONFIG_SN, "[MAIN] Loading state and settings...");
     db.LoadSettings();
     db.LoadState();
-
-/*
-    uint32_t up = 200;
-    while(1) {
-        Settings s = db.GetSettings();
-        s.ws_update_rate = up++;
-        db.UpdateSettings(s);
-
-        vTaskDelay(10000 / portTICK_PERIOD_MS);
-    }
-*/
 }

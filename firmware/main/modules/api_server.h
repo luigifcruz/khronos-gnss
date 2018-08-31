@@ -14,6 +14,10 @@
 #include "websocket_server.h"
 #include "database.h"
 
+extern "C" {
+#include "wpa2/utils/base64.h"
+};
+
 const static int client_queue_size = 10;
 const static char http_hdr[] = "HTTP/1.1 200 OK\r\nContent-type: application/json\r\n\r\n";
 
@@ -25,6 +29,7 @@ class ApiServer {
     static void ServerHandleTask(void* pvParameters);
     static void HttpServe(struct netconn *conn, void* that);
     static void WebSocketCallback(uint8_t num, WEBSOCKET_TYPE_t type, char* msg, uint64_t len, void* parameter);
+    static void BroadcastSerial(char* res);
     
     public:
     ApiServer(Database* db);

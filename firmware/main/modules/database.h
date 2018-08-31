@@ -14,6 +14,7 @@ typedef struct {
 typedef struct {
     uint16_t ws_update_rate;
     uint16_t led_status;
+    uint8_t serial_tx_active;
 } Settings;
 
 typedef void (*Notifier)(char* key, char* zone, void* value);

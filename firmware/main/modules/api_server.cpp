@@ -2,8 +2,18 @@
 
 static QueueHandle_t client_queue;
 
+void ApiServer::BroadcastSerial(char* res) {
+    unsigned char* msg = base64_encode((const unsigned char*)res, strlen(res), NULL);
+    printf("[PAYLOAD=%s]\n", msg);
+}
+
 void ApiServer::DeltaResponder(char* key, char* zone, void* value) {
     char* delta = ApiHandler::Response(key, zone, ((Database*)value));
+
+    if (((Database*)value)->GetSettings().serial_tx_active) {
+        ApiServer::BroadcastSerial(delta);
+    }
+
     ws_server_send_text_all_from_callback(delta, strlen(delta));
 }
 
@@ -66,6 +76,10 @@ void ApiServer::HttpServe(struct netconn *conn, void* parameter) {
 
                 if (broadcast) {
                     ws_server_send_text_all_from_callback(res, strlen(res));
+
+                    if (((Database*)parameter)->GetSettings().serial_tx_active) {
+                        ApiServer::BroadcastSerial(res);
+                    }
                 }
             }
 

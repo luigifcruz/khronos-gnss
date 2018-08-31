@@ -2,7 +2,7 @@
 
 int KeyStorage::CheckError() {
     if (this->ret != ESP_OK) {
-        ESP_LOGE(CONFIG_SN, "[NVS] Operation error!");
+        ESP_LOGE(CONFIG_SN, "[NVS] Operation error! %d", this->ret);
         return 1;
     }
     return 0;

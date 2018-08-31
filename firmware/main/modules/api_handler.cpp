@@ -31,6 +31,9 @@ char* ApiHandler::Response(char* key, char* zone, Database* db) {
         if (strstr(key, "led_status") || (key && !key[0])) {
             ApiHandler::AddKey((char*)"led_status", (char*)"settings", (char*)std::to_string(db->GetSettings().led_status).c_str(), changes);
         }
+        if (strstr(key, "serial_tx_active") || (key && !key[0])) {
+            ApiHandler::AddKey((char*)"serial_tx_active", (char*)"settings", (char*)std::to_string(db->GetSettings().serial_tx_active).c_str(), changes);
+        }
     }
     
     if (strstr(zone, "state") || (zone && !zone[0])) {
@@ -63,6 +66,18 @@ char* ApiHandler::Request(cJSON* req, Database* db, bool* broadcast) {
             if (strstr(target, "led_off")) {
                 Settings s = db->GetSettings();
                 s.led_status = 0x0000;
+                db->UpdateSettings(s);
+            }
+
+            if (strstr(target, "serial_tx_on")) {
+                Settings s = db->GetSettings();
+                s.serial_tx_active = 0x01;
+                db->UpdateSettings(s);
+            }
+
+            if (strstr(target, "serial_tx_off")) {
+                Settings s = db->GetSettings();
+                s.serial_tx_active = 0x00;
                 db->UpdateSettings(s);
             }
         }
