@@ -30,6 +30,6 @@ FlashStorage::FlashStorage() {
     if (ret != ESP_OK) {
         ESP_LOGE(CONFIG_SN, "[FLASH_FS] Failed to get SPIFFS partition information (%s).", esp_err_to_name(ret));
     } else {
-        ESP_LOGI(CONFIG_SN, "[FLASH_FS] Partition size: total: %d, used: %d.", total, used);
+        ESP_LOGI(CONFIG_SN, "[FLASH_FS] Partition space: %.02f%% used of %d.", ((float)used/(float)total)*100, total);
     }
 }

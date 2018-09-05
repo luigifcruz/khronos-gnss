@@ -29,7 +29,9 @@ Wireless::Wireless() {
     wifi_event_group = xEventGroupCreate();
 
     esp_log_level_set("wifi", ESP_LOG_WARN);
-
+    esp_log_level_set("event", ESP_LOG_WARN);
+    esp_log_level_set("system_api", ESP_LOG_WARN);
+    
     tcpip_adapter_init();
     esp_event_loop_init(this->EventHandler, this);
 

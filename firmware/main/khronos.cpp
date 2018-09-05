@@ -1,3 +1,4 @@
+#include "driver/gpio.h"
 #include "esp_system.h"
 #include "esp_log.h"
 
@@ -8,15 +9,15 @@
 #include "modules/mdns_responder.h"
 #include "modules/api_server.h"
 #include "modules/database.h"
-#include "driver/gpio.h"
-
-extern "C" {
-    void app_main();
-}
+#include "modules/ntp_server.h"
 
 static void LedNotifier(char* key, char* zone, void* value) {
     uint16_t* lvl = (uint16_t*)value;
     gpio_set_level(GPIO_NUM_2, (uint32_t)*lvl);
+}
+
+extern "C" {
+    void app_main();
 }
 
 void app_main() {
@@ -29,7 +30,8 @@ void app_main() {
     
     HttpServer web;
     ApiServer ws(&db);
-
+    NtpServer ntp;
+  
     db.RegisterNotifier((char*)"led", LedNotifier);
 
     gpio_pad_select_gpio(GPIO_NUM_2);
