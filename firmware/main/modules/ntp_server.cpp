@@ -6,7 +6,7 @@ extern const uint8_t ulp_main_bin_end[]   asm("_binary_ulp_main_bin_end");
 void NtpServer::InitCoprocessor() {
     esp_err_t err = ulp_load_binary(0, ulp_main_bin_start, (ulp_main_bin_end - ulp_main_bin_start) / sizeof(uint32_t));
     if (err) {
-        ESP_LOGE(CONFIG_SN, "[ULP] Coprocessor failed to start!");
+        ESP_LOGE(CONFIG_SN, "[ULP] Failed to load coprocessor firmware.");
         return;
     }
 

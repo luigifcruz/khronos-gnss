@@ -10,6 +10,7 @@
 #include "modules/api_server.h"
 #include "modules/database.h"
 #include "modules/ntp_server.h"
+#include "modules/gps_handler.h"
 
 static void LedNotifier(char* key, char* zone, void* value) {
     uint16_t* lvl = (uint16_t*)value;
@@ -31,6 +32,7 @@ void app_main() {
     HttpServer web;
     ApiServer ws(&db);
     NtpServer ntp;
+    GpsHandler gps;
   
     db.RegisterNotifier((char*)"led", LedNotifier);
 

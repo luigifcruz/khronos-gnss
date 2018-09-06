@@ -1,3 +1,6 @@
 [submodule "firmware/components/esp32-websocket"]
 	path = firmware/components/esp32-websocket
-	url = https://github.com/Molorius/esp32-websocket.git
+	url = https://github.com/luigifreitas/esp32-websocket.git
+[submodule "firmware/main/modules/minmea"]
+	path = firmware/main/modules/minmea
+	url = https://github.com/kosma/minmea.git

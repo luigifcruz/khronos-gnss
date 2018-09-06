@@ -27,7 +27,7 @@ checkin:
   /* Check Checkmark */
   move r3, checkmark
   ld r2, r3, 0
-	add r2, r2, 1
+  add r2, r2, 1
   st r2, r3, 0
 
   /* Start PPS Loop */
