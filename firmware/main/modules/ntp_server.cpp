@@ -35,6 +35,10 @@ void NtpServer::InitCoprocessor() {
     }
 }
 
+void NtpServer::GetTime(tstamp* time) {
+    printf("GetTime Called: %d.\n", (ulp_checkmark & UINT16_MAX));
+}
+
 void NtpServer::UdpHandler(void* pvParameters) {
     struct sockaddr_in si_other;
     unsigned int recv_len, slen = sizeof(si_other);;
@@ -57,7 +61,8 @@ void NtpServer::UdpHandler(void* pvParameters) {
     }
 
     ESP_LOGI(CONFIG_SN, "[NTP SERVER] Server listening...");
-    char buf[BUFFLEN];
+    char *buf = (char*)malloc(BUFFLEN);
+    NtpHandler *ntp = (NtpHandler*)pvParameters;
 
     while (1)  {
         memset(buf, 0, BUFFLEN);
@@ -66,26 +71,20 @@ void NtpServer::UdpHandler(void* pvParameters) {
             ESP_LOGE(CONFIG_SN, "[NTP SERVER] Couldn't receive data from client.");
             break;
         }
-            
-        ESP_LOGI(CONFIG_SN,"Received packet from %s:%d", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
 
-        sendto(mysocket, buf, strlen(buf), 0, (struct sockaddr *)&si_other, slen);
+        tstamp recv_time;
+        NtpServer::GetTime(&recv_time);
 
-        int i,j;
-        for (j = 0; j < recv_len; j++) {
-            for (i = 0; i < 8; i++) {
-                printf("%d", !!((buf[j] << i) & 0x80));
-            }
+        int err = ntp->FromBinary(buf, recv_len);
+        if (err) {
+            ESP_LOGE(CONFIG_SN, "[NTP SERVER] Error parsing NTP request.");
         }
-        printf("\n");
 
-        NtpPacket ntp;
-        memcpy(&ntp, buf, sizeof(ntp));
+        ntp->Print();
 
-        printf("Peer Clock Precision: %d\n", ntp.precision);
-        printf("Root Delay: %u\n", ntohl(ntp.rootdelay));
-        printf("Root Dispersion: %u\n", ntp.rootdisp);
-            
+        sendto(mysocket, ntp->Reply(recv_time, &NtpServer::GetTime), sizeof(NtpPacket), 0, (struct sockaddr *)&si_other, slen);
+        
+        ESP_LOGI(CONFIG_SN, "[NTP SERVER] Replied to NTP request from %s:%d", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
         if ((recv_len + 1) < BUFFLEN) { buf[recv_len + 1] = '\0'; }
     }
         
@@ -95,7 +94,9 @@ void NtpServer::UdpHandler(void* pvParameters) {
 NtpServer::NtpServer() {
     ESP_LOGI(CONFIG_SN, "[NTP SERVER] Service Stated...");
 
+    static NtpHandler ntp;
+
     this->InitCoprocessor();
-    xTaskCreate(NtpServer::UdpHandler, "UdpHandler", 2*4096, NULL, 20, NULL); 
+    xTaskCreate(NtpServer::UdpHandler, "UdpHandler", 2*4096, &ntp, 20, NULL); 
 }
 

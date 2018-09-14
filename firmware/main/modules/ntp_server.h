@@ -22,27 +22,10 @@
 #include <time.h>
 #include <sys/time.h>
 
+#include "ntp_handler.h"
+
 #define BUFFLEN 512
 #define NTPPORT 123
-
-typedef struct {
-    uint32_t seconds;
-    uint32_t fraction;
-} tstamp;
-
-typedef struct {
-	char		metadata;		/* ntp flags*/
-    char    	stratum;        /* stratum */
-    char    	poll;           /* poll interval */
-    uint8_t	  	precision;      /* precision */
-    uint32_t	rootdelay;      /* root delay */
-    uint32_t   	rootdisp;       /* root dispersion */
-    char    	refid;          /* reference ID */
-    tstamp  	reftime;        /* reference time */
-    tstamp  	org;            /* origin timestamp */
-    tstamp  	rec;            /* receive timestamp */
-    tstamp  	xmt;            /* transmit timestamp */
-} NtpPacket;
 
 class NtpServer {
 private:
@@ -50,6 +33,8 @@ private:
     static void UdpHandler(void* pvParameters);
 
 public:
+	static void GetTime(tstamp* time);
+
     NtpServer();
 };
 
