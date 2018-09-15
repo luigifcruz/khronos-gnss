@@ -31,7 +31,7 @@ void NtpServer::InitCoprocessor() {
         ESP_LOGE(CONFIG_SN, "[ULP] Coprocessor failed to start!"); 
     } else {
         vTaskDelay(100 / portTICK_RATE_MS);
-        ESP_LOGI(CONFIG_SN, "[ULP] Coprocessor successfully started! (Checkmark: %d)", (ulp_checkmark & UINT16_MAX)); 
+        ESP_LOGI(CONFIG_SN, "[ULP] Coprocessor successfully started! (Heartbeat: %d)", (ulp_checkmark & UINT16_MAX)); 
     }
 }
 

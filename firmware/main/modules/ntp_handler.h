@@ -43,6 +43,7 @@ private:
 public:
     int FromBinary(char* dat, unsigned int size);
     char* Reply(tstamp recv_time, GetTime getTime);
+    void ToUNIX(tstamp ntp_t, time_t* unix_t);
     void Print();
 
     NtpHandler();

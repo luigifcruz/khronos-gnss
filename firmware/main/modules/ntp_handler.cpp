@@ -4,6 +4,20 @@ bool NtpHandler::IsValid() {
 	return this->IsFilled;
 }
 
+void NtpHandler::ToUNIX(tstamp ntp_t, time_t* unix_t) {
+	*unix_t = ntp_t.seconds - 2208988800UL;
+
+	/*
+	time_t now;
+    struct tm timeinfo;
+    char strftime_buf[64];
+    ToUNIX(ntp->xmt, &now);
+	localtime_r(&now, &timeinfo);
+	strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
+	ESP_LOGI(CONFIG_SN, "The current date/time in Brasilia is: %s", strftime_buf);
+	*/
+}
+
 void NtpHandler::Print() {
 	if (!this->IsValid()) {
 		return;

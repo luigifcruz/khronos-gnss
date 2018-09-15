@@ -7,22 +7,16 @@ esp_err_t get_handler(httpd_req_t *req) {
     unsigned int bytes_read = 0;
     char *file_name = (char*)req->user_ctx;
     
-    if (file_name == NULL) {
-        char *query = (char *)malloc(64);
-        char *file_n = (char *)malloc(64);
+    file = fopen(file_name, "r");
 
-        httpd_req_get_url_query_str(req, query, 64);
-
-        strcpy(file_n, "/spiffs/cdn/");
-        strcat(file_n, query);
-
-        file = fopen(file_n, "r");
-        httpd_resp_set_type(req, "application/octet-stream");
+    if (strstr((char*)req->uri, ".css")) {
+        httpd_resp_set_type(req, "text/css");
+    } else if (strstr((char*)req->uri, ".js")) {
+        httpd_resp_set_type(req, "application/javascript");
     } else {
-        file = fopen(file_name, "r");
         httpd_resp_set_type(req, "text/html");
     }
-
+    
     if(file == NULL) {
         httpd_resp_send_404(req);
         return ESP_OK;
@@ -33,8 +27,11 @@ esp_err_t get_handler(httpd_req_t *req) {
     fseek(file, 0, SEEK_SET);
 
     while (bytes_read < file_size) {
-        fread(file_buffer, BUF_SIZE, 1, file);
-        httpd_resp_send_chunk(req, file_buffer, (file_size > BUF_SIZE) ? BUF_SIZE : file_size);
+        if (fread(file_buffer, BUF_SIZE, 1, file) == 0) {
+            httpd_resp_send_chunk(req, file_buffer, file_size % BUF_SIZE);
+        } else {
+            httpd_resp_send_chunk(req, file_buffer, (file_size > BUF_SIZE) ? BUF_SIZE : file_size);
+        }
         bytes_read += BUF_SIZE;
     }
 
@@ -48,42 +45,49 @@ httpd_uri_t gnss = {
     .uri       = "/gnss",
     .method    = HTTP_GET,
     .handler   = get_handler,
-    .user_ctx  = (void*)"/spiffs/gnss.html"
+    .user_ctx  = (void*)"/spiffs/index.html"
 };
 
 httpd_uri_t clock = {
     .uri       = "/clock",
     .method    = HTTP_GET,
     .handler   = get_handler,
-    .user_ctx  = (void*)"/spiffs/clock.html"
+    .user_ctx  = (void*)"/spiffs/index.html"
 };
 
 httpd_uri_t settings = {
     .uri       = "/settings",
     .method    = HTTP_GET,
     .handler   = get_handler,
-    .user_ctx  = (void*)"/spiffs/settings.html"
+    .user_ctx  = (void*)"/spiffs/index.html"
 };
 
 httpd_uri_t tuner = {
     .uri       = "/tuner",
     .method    = HTTP_GET,
     .handler   = get_handler,
-    .user_ctx  = (void*)"/spiffs/tuner.html"
+    .user_ctx  = (void*)"/spiffs/index.html"
 };
 
 httpd_uri_t dashboard = {
     .uri       = "/",
     .method    = HTTP_GET,
     .handler   = get_handler,
-    .user_ctx  = (void*)"/spiffs/dashboard.html"
+    .user_ctx  = (void*)"/spiffs/index.html"
 };
 
-httpd_uri_t file = {
-    .uri       = "/file",
+httpd_uri_t style = {
+    .uri       = "/style.css",
     .method    = HTTP_GET,
     .handler   = get_handler,
-    .user_ctx  = NULL
+    .user_ctx  = (void*)"/spiffs/style.css"
+};
+
+httpd_uri_t bundle = {
+    .uri       = "/bundle.js",
+    .method    = HTTP_GET,
+    .handler   = get_handler,
+    .user_ctx  = (void*)"/spiffs/bundle.js"
 };
 
 void HttpServer::Stop() {
@@ -101,7 +105,8 @@ HttpServer::HttpServer() {
         httpd_register_uri_handler(server, &settings);
         httpd_register_uri_handler(server, &clock);
         httpd_register_uri_handler(server, &gnss);
-        httpd_register_uri_handler(server, &file);
+        httpd_register_uri_handler(server, &style);
+        httpd_register_uri_handler(server, &bundle);
     } else {
         ESP_LOGI(CONFIG_SN, "[HTTP] Error starting HTTP server!");
     }

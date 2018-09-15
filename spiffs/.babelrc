@@ -1,0 +1,9 @@
+{
+    "plugins": [
+        [ "babel-plugin-transform-require-ignore", { "extensions": [".scss"] } ]
+    ],
+    "presets": [
+        "react",
+        "es2015"
+    ]
+}
