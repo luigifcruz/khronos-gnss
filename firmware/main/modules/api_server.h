@@ -19,7 +19,7 @@ extern "C" {
 };
 
 const static int client_queue_size = 10;
-const static char http_hdr[] = "HTTP/1.1 200 OK\r\nContent-type: application/json\r\n\r\n";
+const static char http_hdr[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-type: application/json\r\nConnection: close\r\n\r\n";
 
 class ApiServer {
     private:

@@ -20,28 +20,28 @@ void ApiServer::DeltaResponder(char* key, char* zone, void* value) {
 void ApiServer::WebSocketCallback(uint8_t num, WEBSOCKET_TYPE_t type, char* msg, uint64_t len, void* parameter) {
      switch(type) {
         case WEBSOCKET_CONNECT:
-            ESP_LOGI(CONFIG_SN, "[SOCKET] Client #%d connected!", num);
+            ESP_LOGI(CONFIG_SN, "[API] Client #%d connected!", num);
             break;
         case WEBSOCKET_DISCONNECT_EXTERNAL:
-            ESP_LOGI(CONFIG_SN, "[SOCKET] Client #%d disconnected.", num);
+            ESP_LOGI(CONFIG_SN, "[API] Client #%d disconnected.", num);
             break;
         case WEBSOCKET_DISCONNECT_INTERNAL:
-            ESP_LOGI(CONFIG_SN, "[SOCKET] We disconnected client #%d.", num);
+            ESP_LOGI(CONFIG_SN, "[API] We disconnected client #%d.", num);
             break;
         case WEBSOCKET_DISCONNECT_ERROR:
-            ESP_LOGI(CONFIG_SN, "[SOCKET] An error disconnected client #%d.", num);
+            ESP_LOGI(CONFIG_SN, "[API] An error disconnected client #%d.", num);
             break;
         case WEBSOCKET_BIN:
-            ESP_LOGI(CONFIG_SN, "[SOCKET] Binary Message from Client #%d: %s", num, msg);
+            ESP_LOGI(CONFIG_SN, "[API] Binary Message from Client #%d: %s", num, msg);
             break;
         case WEBSOCKET_PING:
-            ESP_LOGI(CONFIG_SN, "[SOCKET] Client #%d pinged us: %s", num, msg);
+            ESP_LOGI(CONFIG_SN, "[API] Client #%d pinged us: %s", num, msg);
             break;
         case WEBSOCKET_PONG:
-            ESP_LOGI(CONFIG_SN, "[SOCKET] Client #%d responded to the ping.", num);
+            ESP_LOGI(CONFIG_SN, "[API] Client #%d responded to the ping.", num);
             break;
         case WEBSOCKET_TEXT:
-            ESP_LOGI(CONFIG_SN, "[SOCKET] Client #%d sent message.", num);
+            ESP_LOGI(CONFIG_SN, "[API] Client #%d sent message.", num);
             break;
     }
 }
@@ -87,7 +87,7 @@ void ApiServer::HttpServe(struct netconn *conn, void* parameter) {
             netconn_delete(conn);
             netbuf_delete(inbuf);
         } else {
-            ESP_LOGW(CONFIG_SN, "[SOCKETS] Bad request, dropping...");
+            ESP_LOGW(CONFIG_SN, "[API] Bad request, dropping...");
             netconn_close(conn);
             netconn_delete(conn);
             netbuf_delete(inbuf);
@@ -104,7 +104,7 @@ void ApiServer::ServerHandleTask(void* pvParameters) {
     netconn_bind(conn, NULL, 8080);
     netconn_listen(conn);
     
-    ESP_LOGI(CONFIG_SN, "[SOCKETS] Server listening...");
+    ESP_LOGI(CONFIG_SN, "[API] Server listening...");
     while (err == ERR_OK) {
         err = netconn_accept(conn, &newconn);
         if(err == ERR_OK) {
@@ -112,7 +112,7 @@ void ApiServer::ServerHandleTask(void* pvParameters) {
         }
     }
 
-    ESP_LOGE(CONFIG_SN, "[SOCKETS] Task ended. Restarting...");
+    ESP_LOGE(CONFIG_SN, "[API] Task ended. Restarting...");
     netconn_close(conn);
     netconn_delete(conn);
     esp_restart();
@@ -130,7 +130,7 @@ void ApiServer::ServerHandleQueue(void* pvParameters) {
 }
 
 ApiServer::ApiServer(Database* db) {
-    ESP_LOGI(CONFIG_SN, "[SOCKETS] Service Stated...");
+    ESP_LOGI(CONFIG_SN, "[API] Service Stated...");
 
     this->db = db;
     this->db->RegisterNotifier((char*)"socket", &this->DeltaResponder);

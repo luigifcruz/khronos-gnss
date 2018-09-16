@@ -3,9 +3,14 @@ import Reducer from './reducer'
 import createLogger from 'redux-logger'
 
 let defaultState = {
-    auth: null,
-    assets: [],
-    upload: []
+    'state': {
+    	'fs_frequency': 100
+    },
+    'settings': {
+    	'ws_update_rate': 0,
+    	'led_status': 0,
+    	'serial_tx_active': 0
+    }
 }
 
 const middleware = [ ]

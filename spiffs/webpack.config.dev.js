@@ -3,6 +3,7 @@ const config = require('konfig')({ path: "./" });
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 module.exports = [{
+    devtool: 'inline-source-map',
     entry: './src/client/client.js',
     output: {
         path: "./dist",
@@ -26,6 +27,8 @@ module.exports = [{
         }]
     },
     plugins: [
+    new webpack.optimize.OccurrenceOrderPlugin(),
+    new webpack.NoErrorsPlugin(),
     new ExtractTextPlugin("style.css"),
     new webpack.DefinePlugin({
         'process.env': {
