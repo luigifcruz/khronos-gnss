@@ -26,6 +26,10 @@ esp_err_t get_handler(httpd_req_t *req) {
     file_size = ftell(file);
     fseek(file, 0, SEEK_SET);
 
+    char cont_len[8];
+    sprintf(cont_len, "%d", file_size);
+    httpd_resp_set_hdr(req, "content-length", cont_len);
+
     while (bytes_read < file_size) {
         if (fread(file_buffer, BUF_SIZE, 1, file) == 0) {
             httpd_resp_send_chunk(req, file_buffer, file_size % BUF_SIZE);

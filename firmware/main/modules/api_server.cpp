@@ -60,6 +60,8 @@ void ApiServer::HttpServe(struct netconn *conn, void* parameter) {
 
         if (buf && strstr(buf, "GET /api/stream ") && strstr(buf, "Upgrade: websocket")) {
             ws_server_add_client(conn, buf, buflen, (char*)"/api/stream", ApiServer::WebSocketCallback);
+            char* bulk = ApiHandler::Response((char*)"", (char*)"", ((Database*)parameter));
+            ws_server_send_text_all_from_callback(bulk, strlen(bulk));
             netbuf_delete(inbuf);
         } else if (buf && strstr(buf, "POST /api/request ")) {
             std::string str(buf);
