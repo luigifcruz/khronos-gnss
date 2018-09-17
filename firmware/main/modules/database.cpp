@@ -35,7 +35,29 @@ void Database::UpdateSettings(Settings data) {
 };
 
 void Database::UpdateState(State data) {
+    if (data.gps_fix_quality != this->state.gps_fix_quality) {
+        memcpy(&this->state.gps_fix_quality, &data.gps_fix_quality, sizeof(uint8_t));
 
+        this->snf((char*)"gps_fix_quality", (char*)"state", this);
+    }
+
+    if (data.gps_fix_type != this->state.gps_fix_type) {
+        memcpy(&this->state.gps_fix_type, &data.gps_fix_type, sizeof(uint8_t));
+
+        this->snf((char*)"gps_fix_type", (char*)"state", this);
+    }
+
+    if (data.gps_sat_numb != this->state.gps_sat_numb) {
+        memcpy(&this->state.gps_sat_numb, &data.gps_sat_numb, sizeof(uint8_t));
+
+        this->snf((char*)"gps_sat_numb", (char*)"state", this);
+    }
+
+    if (data.glonass_sat_numb != this->state.glonass_sat_numb) {
+        memcpy(&this->state.glonass_sat_numb, &data.glonass_sat_numb, sizeof(uint8_t));
+
+        this->snf((char*)"glonass_sat_numb", (char*)"state", this);
+    }
 };
 
 // END
@@ -55,7 +77,16 @@ void Database::LoadSettings() {
 }
 
 void Database::LoadState() {
-    
+    State s;
+    memset(&s, 0, sizeof(s));
+
+    s.gps_fix_quality = 0;
+    s.gps_fix_type = 0;
+    s.gps_sat_numb = 0;
+    s.glonass_sat_numb = 0;
+
+    this->UpdateState(s);
+    this->StateLoaded = true;
 }
 
 // END

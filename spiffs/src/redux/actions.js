@@ -5,7 +5,10 @@ export const UPDATE_SETTINGS = "UPDATE_SETTINGS"
 
 export const props = {
     'state': {
-        'fs_frequency': PropTypes.number
+        'gps_fix_quality': PropTypes.number,
+        'gps_fix_type': PropTypes.number,
+        'gps_sat_numb': PropTypes.number,
+        'glonass_sat_numb': PropTypes.number
     },
     'settings': {
         'ws_update_rate': PropTypes.number,
@@ -16,7 +19,10 @@ export const props = {
 
 export const mapStateToProps = (state) => ({
     'state': {
-        'fs_frequency': state.state.fs_frequency
+        'gps_fix_quality': state.state.gps_fix_quality,
+        'gps_fix_type': state.state.gps_fix_type,
+        'gps_sat_numb': state.state.gps_sat_numb,
+        'glonass_sat_numb': state.state.glonass_sat_numb
     },
     'settings': {
         'ws_update_rate': state.settings.ws_update_rate,

@@ -8,7 +8,10 @@
 #include "key_storage.h"
 
 typedef struct {
-    uint32_t fs_frequency;
+    uint8_t gps_fix_quality;
+    uint8_t gps_fix_type;
+    uint8_t gps_sat_numb;
+    uint8_t glonass_sat_numb;
 } State;
 
 typedef struct {
@@ -25,6 +28,7 @@ class Database {
     State state;
     KeyStorage* storage;
     bool SettingsLoaded = false;
+    bool StateLoaded = false;
     
     Notifier nf;
     Notifier snf;

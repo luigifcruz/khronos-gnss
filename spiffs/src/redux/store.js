@@ -4,7 +4,10 @@ import createLogger from 'redux-logger'
 
 let defaultState = {
     'state': {
-    	'fs_frequency': 100
+    	'gps_fix_quality': 0,
+    	'gps_fix_type': 0,
+    	'gps_sat_numb': 0,
+    	'glonass_sat_numb': 0
     },
     'settings': {
     	'ws_update_rate': 0,

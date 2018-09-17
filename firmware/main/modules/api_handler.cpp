@@ -37,9 +37,20 @@ char* ApiHandler::Response(char* key, char* zone, Database* db) {
     }
     
     if (strstr(zone, "state") || (zone && !zone[0])) {
-
+        if (strstr(key, "gps_fix_quality") || (key && !key[0])) {
+            ApiHandler::AddKey((char*)"gps_fix_quality", (char*)"state", (char*)std::to_string(db->GetState().gps_fix_quality).c_str(), changes);
+        }
+        if (strstr(key, "gps_fix_type") || (key && !key[0])) {
+            ApiHandler::AddKey((char*)"gps_fix_type", (char*)"state", (char*)std::to_string(db->GetState().gps_fix_type).c_str(), changes);
+        }
+        if (strstr(key, "gps_sat_numb") || (key && !key[0])) {
+            ApiHandler::AddKey((char*)"gps_sat_numb", (char*)"state", (char*)std::to_string(db->GetState().gps_sat_numb).c_str(), changes);
+        }
+        if (strstr(key, "glonass_sat_numb") || (key && !key[0])) {
+            ApiHandler::AddKey((char*)"glonass_sat_numb", (char*)"state", (char*)std::to_string(db->GetState().glonass_sat_numb).c_str(), changes);
+        }
     }
-
+    
     return cJSON_Print(res);
 }
 

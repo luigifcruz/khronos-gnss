@@ -48,6 +48,10 @@ class App extends Component {
             	<Websocket url='ws://khronos.local:8080/api/stream' onOpen= {this.handleEvent.bind(this)} onMessage={this.handleData.bind(this)}/>
                 <p>LED Status: {this.props.settings.led_status}</p>
                 <p>Serial TX Status: {this.props.settings.serial_tx_active}</p>
+                <p>GPS Fix Quality: {this.props.state.gps_fix_quality}</p>
+                <p>GPS Fix Type: {this.props.state.gps_fix_type}</p>
+                <p>GPS Satellites Count: {this.props.state.gps_sat_numb}</p>
+                <p>GLONASS Satellites Count: {this.props.state.glonass_sat_numb}</p>
                 {this.props.children}
             </div>
         )

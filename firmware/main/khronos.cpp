@@ -32,7 +32,7 @@ void app_main() {
     HttpServer web;
     ApiServer ws(&db);
     NtpServer ntp;
-    GpsHandler gps;
+    GpsHandler gps(&db);
   
     db.RegisterNotifier((char*)"led", LedNotifier);
 

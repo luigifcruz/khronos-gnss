@@ -12,7 +12,10 @@ export default function reducer(state, action) {
         case UPDATE_STATE:
         return Object.assign({}, state, {
             state: Object.assign({}, state.state, {
-                fs_frequency: trigger("fs_frequency", state.state.fs_frequency, action)
+                gps_fix_quality: trigger("gps_fix_quality", state.state.gps_fix_quality, action),
+                gps_fix_type: trigger("gps_fix_type", state.state.gps_fix_type, action),
+                gps_sat_numb: trigger("gps_sat_numb", state.state.gps_sat_numb, action),
+                glonass_sat_numb: trigger("glonass_sat_numb", state.state.glonass_sat_numb, action)
             })
         });
 
