@@ -2,20 +2,26 @@
 #define DATABASE_H
 
 #include <cstring>
+#include <string>
+#include <iostream>
 
 #include "esp_event_loop.h"
 #include "esp_system.h"
 #include "key_storage.h"
 
 typedef struct {
-    uint8_t gps_fix_quality;
-    uint8_t gps_fix_type;
-    uint8_t gps_sat_numb;
-    uint8_t glonass_sat_numb;
+    uint8_t gnss_fix_quality;
+    uint8_t gnss_fix_type;
+    uint8_t sat_count_gps;
+    uint8_t sat_count_glonass;
+    float longitude;
+    float latitude;
+    float true_north;
+    float ground_speed;
+    float altitude;
 } State;
 
 typedef struct {
-    uint16_t ws_update_rate;
     uint16_t led_status;
     uint8_t serial_tx_active;
 } Settings;

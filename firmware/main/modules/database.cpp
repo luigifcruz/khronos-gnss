@@ -11,52 +11,77 @@ State Database::GetState() {
 // Database Router 
 
 void Database::UpdateSettings(Settings data) {
-    if (data.ws_update_rate != this->settings.ws_update_rate) {
-        if (SettingsLoaded) { storage->WriteU16("ws_update_rate", data.ws_update_rate); }
-        memcpy(&this->settings.ws_update_rate, &data.ws_update_rate, sizeof(uint16_t));
-
-        this->snf((char*)"ws_update_rate", (char*)"settings", this);
-    }
+    std::string updates;
 
     if (data.led_status != this->settings.led_status) {
         if (SettingsLoaded) { storage->WriteU16("led_status", data.led_status); }
         memcpy(&this->settings.led_status, &data.led_status, sizeof(uint16_t));
+        updates.append("led_status ");
 
         this->nf((char*)"led_status", (char*)"settings", &this->settings.led_status);
-        this->snf((char*)"led_status", (char*)"settings", this);
     }
 
     if (data.serial_tx_active != this->settings.serial_tx_active) {
         if (SettingsLoaded) { storage->WriteU8("se_tx_active", data.serial_tx_active); }
         memcpy(&this->settings.serial_tx_active, &data.serial_tx_active, sizeof(uint8_t));
+        updates.append("serial_tx_active ");
+    }
 
-        this->snf((char*)"serial_tx_active", (char*)"settings", this);
+    if (updates.length() > 0) {
+        this->snf((char*)updates.c_str(), (char*)"settings", this);
     }
 };
 
 void Database::UpdateState(State data) {
-    if (data.gps_fix_quality != this->state.gps_fix_quality) {
-        memcpy(&this->state.gps_fix_quality, &data.gps_fix_quality, sizeof(uint8_t));
+    std::string updates;
 
-        this->snf((char*)"gps_fix_quality", (char*)"state", this);
+    if (data.gnss_fix_quality != this->state.gnss_fix_quality) {
+        memcpy(&this->state.gnss_fix_quality, &data.gnss_fix_quality, sizeof(uint8_t));
+        updates.append("gnss_fix_quality ");
     }
 
-    if (data.gps_fix_type != this->state.gps_fix_type) {
-        memcpy(&this->state.gps_fix_type, &data.gps_fix_type, sizeof(uint8_t));
-
-        this->snf((char*)"gps_fix_type", (char*)"state", this);
+    if (data.gnss_fix_type != this->state.gnss_fix_type) {
+        memcpy(&this->state.gnss_fix_type, &data.gnss_fix_type, sizeof(uint8_t));
+        updates.append("gnss_fix_type ");
     }
 
-    if (data.gps_sat_numb != this->state.gps_sat_numb) {
-        memcpy(&this->state.gps_sat_numb, &data.gps_sat_numb, sizeof(uint8_t));
-
-        this->snf((char*)"gps_sat_numb", (char*)"state", this);
+    if (data.sat_count_gps != this->state.sat_count_gps) {
+        memcpy(&this->state.sat_count_gps, &data.sat_count_gps, sizeof(uint8_t));
+        updates.append("sat_count_gps ");
     }
 
-    if (data.glonass_sat_numb != this->state.glonass_sat_numb) {
-        memcpy(&this->state.glonass_sat_numb, &data.glonass_sat_numb, sizeof(uint8_t));
+    if (data.sat_count_glonass != this->state.sat_count_glonass) {
+        memcpy(&this->state.sat_count_glonass, &data.sat_count_glonass, sizeof(uint8_t));
+        updates.append("sat_count_glonass ");
+    }
 
-        this->snf((char*)"glonass_sat_numb", (char*)"state", this);
+    if (data.latitude != this->state.latitude) {
+        memcpy(&this->state.latitude, &data.latitude, sizeof(float));
+        updates.append("latitude ");
+    }
+
+    if (data.longitude != this->state.longitude) {
+        memcpy(&this->state.longitude, &data.longitude, sizeof(float));
+        updates.append("longitude ");
+    }
+
+    if (data.true_north != this->state.true_north) {
+        memcpy(&this->state.true_north, &data.true_north, sizeof(float));
+        updates.append("true_north ");
+    }
+
+    if (data.ground_speed != this->state.ground_speed) {
+        memcpy(&this->state.ground_speed, &data.ground_speed, sizeof(float));
+        updates.append("ground_speed ");
+    }
+
+    if (data.altitude != this->state.altitude) {
+        memcpy(&this->state.altitude, &data.altitude, sizeof(float));
+        updates.append("altitude ");
+    }
+
+    if (updates.length() > 0) {
+        this->snf((char*)updates.c_str(), (char*)"state", this);
     }
 };
 
@@ -68,7 +93,6 @@ void Database::LoadSettings() {
     Settings s;
     memset(&s, 0, sizeof(s));
     
-    s.ws_update_rate = storage->ReadU16("ws_update_rate");
     s.led_status = storage->ReadU16("led_status");
     s.serial_tx_active = storage->ReadU8("se_tx_active");
 
@@ -80,10 +104,15 @@ void Database::LoadState() {
     State s;
     memset(&s, 0, sizeof(s));
 
-    s.gps_fix_quality = 0;
-    s.gps_fix_type = 0;
-    s.gps_sat_numb = 0;
-    s.glonass_sat_numb = 0;
+    s.gnss_fix_quality = 0;
+    s.gnss_fix_type = 0;
+    s.sat_count_gps = 0;
+    s.sat_count_glonass = 0;
+    s.longitude = 0.00;
+    s.latitude = 0.00;
+    s.true_north = 0.00;
+    s.ground_speed = 0.00;
+    s.altitude = 0.00;
 
     this->UpdateState(s);
     this->StateLoaded = true;

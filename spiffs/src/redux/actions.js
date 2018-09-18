@@ -5,10 +5,15 @@ export const UPDATE_SETTINGS = "UPDATE_SETTINGS"
 
 export const props = {
     'state': {
-        'gps_fix_quality': PropTypes.number,
-        'gps_fix_type': PropTypes.number,
-        'gps_sat_numb': PropTypes.number,
-        'glonass_sat_numb': PropTypes.number
+        'gnss_fix_quality': PropTypes.number,
+        'gnss_fix_type': PropTypes.number,
+        'sat_count_gps': PropTypes.number,
+        'sat_count_glonass': PropTypes.number,
+        'longitude': PropTypes.number,
+        'latitude': PropTypes.number,
+        'true_north': PropTypes.number,
+        'ground_speed': PropTypes.number,
+        'altitude': PropTypes.number
     },
     'settings': {
         'ws_update_rate': PropTypes.number,
@@ -19,13 +24,17 @@ export const props = {
 
 export const mapStateToProps = (state) => ({
     'state': {
-        'gps_fix_quality': state.state.gps_fix_quality,
-        'gps_fix_type': state.state.gps_fix_type,
-        'gps_sat_numb': state.state.gps_sat_numb,
-        'glonass_sat_numb': state.state.glonass_sat_numb
+        'gnss_fix_quality': state.state.gnss_fix_quality,
+        'gnss_fix_type': state.state.gnss_fix_type,
+        'sat_count_gps': state.state.sat_count_gps,
+        'sat_count_glonass': state.state.sat_count_glonass,
+        'longitude': state.state.longitude,
+        'latitude': state.state.latitude,
+        'true_north': state.state.true_north,
+        'ground_speed': state.state.ground_speed,
+        'altitude': state.state.altitude
     },
     'settings': {
-        'ws_update_rate': state.settings.ws_update_rate,
         'led_status': state.settings.led_status,
         'serial_tx_active': state.settings.serial_tx_active
     }

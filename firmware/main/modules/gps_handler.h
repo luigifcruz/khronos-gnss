@@ -27,7 +27,6 @@ class GpsHandler {
     Database* db;
 
     static void GpsChannel(void* pvParameters);
-    static void PrintNMEA(char* line);
     static void ParseNMEA(char* line, void* pvParameters);
     static void ProgramUBX();
 

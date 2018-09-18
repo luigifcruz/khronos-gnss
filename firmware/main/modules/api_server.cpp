@@ -13,8 +13,9 @@ void ApiServer::DeltaResponder(char* key, char* zone, void* value) {
     if (((Database*)value)->GetSettings().serial_tx_active) {
         ApiServer::BroadcastSerial(delta);
     }
-
+    //printf("Free Memory: %d\n", xPortGetFreeHeapSize());
     ws_server_send_text_all_from_callback(delta, strlen(delta));
+    free(delta);
 }
 
 void ApiServer::WebSocketCallback(uint8_t num, WEBSOCKET_TYPE_t type, char* msg, uint64_t len, void* parameter) {
@@ -63,6 +64,7 @@ void ApiServer::HttpServe(struct netconn *conn, void* parameter) {
             char* bulk = ApiHandler::Response((char*)"", (char*)"", ((Database*)parameter));
             ws_server_send_text_all_from_callback(bulk, strlen(bulk));
             netbuf_delete(inbuf);
+            free(bulk);
         } else if (buf && strstr(buf, "POST /api/request ")) {
             std::string str(buf);
             str = str.substr(0, buflen);
@@ -85,6 +87,7 @@ void ApiServer::HttpServe(struct netconn *conn, void* parameter) {
                 }
             }
 
+            cJSON_Delete(req);
             netconn_close(conn);
             netconn_delete(conn);
             netbuf_delete(inbuf);
