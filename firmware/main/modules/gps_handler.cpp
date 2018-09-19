@@ -17,7 +17,7 @@ char *readLine(uart_port_t uart) {
     }
 }
 
-void GpsHandler::ParseNMEA(char* line, void* pvParameters) {
+void GpsHandler::ParseNMEA(char* line, void* pvParameters, time_t* then) {
     static Database *db = (Database*)pvParameters;
     State s = db->GetState();
 
@@ -60,6 +60,32 @@ void GpsHandler::ParseNMEA(char* line, void* pvParameters) {
             }
         } break;
 
+        case MINMEA_SENTENCE_ZDA: {
+            struct minmea_sentence_zda frame;
+            if (minmea_parse_zda(&frame, line)) {
+                time_t now;
+                struct tm tm;
+                time(&now);
+                localtime_r(&now, &tm);
+                tm.tm_year = frame.date.year - 1900;
+                tm.tm_mon = frame.date.month - 1;
+                tm.tm_mday = frame.date.day;
+                tm.tm_hour = frame.time.hours - frame.hour_offset;
+                tm.tm_min = frame.time.minutes - frame.minute_offset;
+                tm.tm_sec = frame.time.seconds;
+
+                if (now-*then > 60 || now < 50) {
+                    const struct timeval tv = {mktime(&tm), 0};
+                    settimeofday(&tv, 0);
+                    *then = now;
+
+                    char strftime_buf[64];
+                    strftime(strftime_buf, sizeof(strftime_buf), "%FT%TZ", &tm);
+                    ESP_LOGI(CONFIG_SN, "[GPS] Time updated to %s", strftime_buf);
+                }
+            }
+        } break;
+
         default: break;
     }
 
@@ -69,11 +95,20 @@ void GpsHandler::ParseNMEA(char* line, void* pvParameters) {
 void GpsHandler::ProgramUBX() {
     const char ubx_enable_zda[] = {0x24, 0x45, 0x49, 0x47, 0x50, 0x51, 0x2c, 0x5a, 0x44, 0x41, 0x2a, 0x33, 0x39, 0x0d, 0x0a, 0xb5, 0x62, 0x06, 0x01, 0x03, 0x00, 0xf0, 0x08, 0x01, 0x03, 0x20};
     uart_write_bytes(UART_NUM_2, (const char *)&ubx_enable_zda, sizeof(ubx_enable_zda));
+
+    //const char ubx_10hz_update[] = {0xb5, 0x62, 0x06, 0x08, 0x06, 0x00, 0x64, 0x00, 0x01, 0x00, 0x01, 0x00, 0x7A, 0x12};
+    //uart_write_bytes(UART_NUM_2, (const char *)&ubx_10hz_update, sizeof(ubx_10hz_update));
+
+    //const char ubx_enable_fast[] = {0xb5, 0x62, 0x06, 0x00, 0x14, 0x00, 0x01, 0x00, 0x00, 0x00, 0xd0, 0x08, 0x00, 0x00, 0x00, 0xc2, 0x01, 0x00, 0x07, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc4, 0x96, 0xb5, 0x62, 0x06, 0x00, 0x01, 0x00, 0x01, 0x08, 0x22};
+    //uart_write_bytes(UART_NUM_2, (const char *)&ubx_enable_fast, sizeof(ubx_enable_fast));
+    //uart_set_baudrate(UART_NUM_2, 115200);
+
     ESP_LOGI(CONFIG_SN, "[GPS] UBX module programmed.");
 }
 
 void GpsHandler::GpsChannel(void* pvParameters) {
     uart_config_t uart_config;
+    time_t then = 0;
     
     uart_config.baud_rate = 9600;
     uart_config.data_bits = UART_DATA_8_BITS;
@@ -91,7 +126,7 @@ void GpsHandler::GpsChannel(void* pvParameters) {
     while (1) {
         char *line = readLine(UART_NUM_2);
         //printf("%s", line);
-        GpsHandler::ParseNMEA(line, pvParameters);
+        GpsHandler::ParseNMEA(line, pvParameters, &then);
     }
 }
 
@@ -99,5 +134,5 @@ GpsHandler::GpsHandler(Database* db) {
     ESP_LOGI(CONFIG_SN, "[GPS] Service Stated...");
 
     this->db = db;
-    xTaskCreate(GpsHandler::GpsChannel, "GpsChannel", 4096, db, 10, NULL);
+    xTaskCreate(GpsHandler::GpsChannel, "GpsChannel", 4096, db, 1, NULL);
 }

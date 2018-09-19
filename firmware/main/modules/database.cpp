@@ -55,6 +55,11 @@ void Database::UpdateState(State data) {
         updates.append("sat_count_glonass ");
     }
 
+    if (data.sat_count_galileo != this->state.sat_count_galileo) {
+        memcpy(&this->state.sat_count_galileo, &data.sat_count_galileo, sizeof(uint8_t));
+        updates.append("sat_count_galileo ");
+    }
+
     if (data.latitude != this->state.latitude) {
         memcpy(&this->state.latitude, &data.latitude, sizeof(float));
         updates.append("latitude ");
@@ -108,6 +113,7 @@ void Database::LoadState() {
     s.gnss_fix_type = 0;
     s.sat_count_gps = 0;
     s.sat_count_glonass = 0;
+    s.sat_count_galileo = 0;
     s.longitude = 0.00;
     s.latitude = 0.00;
     s.true_north = 0.00;

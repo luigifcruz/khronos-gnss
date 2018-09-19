@@ -64,7 +64,10 @@ int NtpHandler::FromBinary(char* dat, unsigned int size) {
 char* NtpHandler::Reply(tstamp recv_time, GetTime getTime) {
 	ntp->flags = 0b11000000 | 0b00100000 | 0b00000100;
 	ntp->stratum = 0x01;
-	ntp->precision = 0x00;
+    ntp->poll = 0x0d;
+	ntp->precision = 0xe3;
+    ntp->rootdelay = 0x10;
+    ntp->rootdisp = 0x20;
 	strncpy((char*)ntp->refid, "GPS", sizeof(ntp->refid));
 	ntp->org  = ntp->xmt;
 	ntp->rec = recv_time;

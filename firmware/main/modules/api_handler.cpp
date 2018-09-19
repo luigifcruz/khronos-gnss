@@ -46,6 +46,9 @@ char* ApiHandler::Response(char* key, char* zone, Database* db) {
         if (strstr(key, "sat_count_glonass ") || (key && !key[0])) {
             ApiHandler::AddKey((char*)"sat_count_glonass", (char*)"state", (char*)std::to_string(db->GetState().sat_count_glonass).c_str(), changes);
         }
+        if (strstr(key, "sat_count_galileo ") || (key && !key[0])) {
+            ApiHandler::AddKey((char*)"sat_count_galileo", (char*)"state", (char*)std::to_string(db->GetState().sat_count_galileo).c_str(), changes);
+        }
         if (strstr(key, "latitude ") || (key && !key[0])) {
             ApiHandler::AddKey((char*)"latitude", (char*)"state", (char*)std::to_string(db->GetState().latitude).c_str(), changes);
         }

@@ -14,6 +14,7 @@ typedef struct {
     uint8_t gnss_fix_type;
     uint8_t sat_count_gps;
     uint8_t sat_count_glonass;
+    uint8_t sat_count_galileo;
     float longitude;
     float latitude;
     float true_north;

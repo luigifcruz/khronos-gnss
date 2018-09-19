@@ -36,7 +36,11 @@ void NtpServer::InitCoprocessor() {
 }
 
 void NtpServer::GetTime(tstamp* time) {
-    printf("GetTime Called: %d.\n", (ulp_checkmark & UINT16_MAX));
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+
+    time->seconds = tv.tv_sec + 2208988800UL;
+    time->fraction = (uint32_t)((double)(tv.tv_usec+1) * (double)(1LL<<32) * 1.0e-6);
 }
 
 void NtpServer::UdpHandler(void* pvParameters) {
@@ -63,6 +67,7 @@ void NtpServer::UdpHandler(void* pvParameters) {
     ESP_LOGI(CONFIG_SN, "[NTP SERVER] Server listening...");
     char *buf = (char*)malloc(BUFFLEN);
     NtpHandler *ntp = (NtpHandler*)pvParameters;
+    tstamp recv_time;
 
     while (1)  {
         memset(buf, 0, BUFFLEN);
@@ -72,15 +77,12 @@ void NtpServer::UdpHandler(void* pvParameters) {
             break;
         }
 
-        tstamp recv_time;
         NtpServer::GetTime(&recv_time);
 
         int err = ntp->FromBinary(buf, recv_len);
         if (err) {
             ESP_LOGE(CONFIG_SN, "[NTP SERVER] Error parsing NTP request.");
         }
-
-        ntp->Print();
 
         sendto(mysocket, ntp->Reply(recv_time, &NtpServer::GetTime), sizeof(NtpPacket), 0, (struct sockaddr *)&si_other, slen);
         
@@ -97,6 +99,6 @@ NtpServer::NtpServer() {
     static NtpHandler ntp;
 
     this->InitCoprocessor();
-    xTaskCreate(NtpServer::UdpHandler, "UdpHandler", 2*4096, &ntp, 20, NULL); 
+    xTaskCreate(NtpServer::UdpHandler, "UdpHandler", 2*4096, &ntp, 1, NULL); 
 }
 

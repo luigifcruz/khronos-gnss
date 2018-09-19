@@ -5,6 +5,9 @@
 #include <string.h>
 #include <ctype.h>
 
+#include <time.h>
+#include <sys/time.h>
+
 #include "esp_system.h"
 #include "esp_log.h"
 #include "driver/uart.h"
@@ -27,7 +30,7 @@ class GpsHandler {
     Database* db;
 
     static void GpsChannel(void* pvParameters);
-    static void ParseNMEA(char* line, void* pvParameters);
+    static void ParseNMEA(char* line, void* pvParameters, time_t* then);
     static void ProgramUBX();
 
     public:
