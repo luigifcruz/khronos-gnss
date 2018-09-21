@@ -62,7 +62,7 @@ int NtpHandler::FromBinary(char* dat, unsigned int size) {
 }
 
 char* NtpHandler::Reply(tstamp recv_time, GetTime getTime) {
-	ntp->flags = 0b11000000 | 0b00100000 | 0b00000100;
+	ntp->flags = 0b00000000 | 0b00100000 | 0b00000100;
 	ntp->stratum = 0x01;
     ntp->poll = 0x0d;
 	ntp->precision = 0xe3;

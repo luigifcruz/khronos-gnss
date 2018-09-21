@@ -2,6 +2,7 @@
 #define HTTPSERVER_H
 
 #include <cstring>
+#include <string>
 #include <sys/param.h>
 #include <http_server.h>
 

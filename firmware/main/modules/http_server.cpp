@@ -1,21 +1,23 @@
 #include "http_server.h"
 
 esp_err_t get_handler(httpd_req_t *req) {
-    FILE *file = NULL;
-    char file_buffer[BUF_SIZE];
-    unsigned int file_size = 0;
-    unsigned int bytes_read = 0;
-    char *file_name = (char*)req->user_ctx;
-    
-    file = fopen(file_name, "r");
+    std::string file_name = std::string((char*)req->user_ctx);
 
     if (strstr((char*)req->uri, ".css")) {
         httpd_resp_set_type(req, "text/css");
     } else if (strstr((char*)req->uri, ".js")) {
-        httpd_resp_set_type(req, "application/javascript");
+        httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
+        httpd_resp_set_type(req, "text/javascript");
+        file_name.append(".gz");
     } else {
         httpd_resp_set_type(req, "text/html");
     }
+
+    FILE *file = NULL;
+    char file_buffer[BUF_SIZE];
+    unsigned int file_size = 0;
+    unsigned int bytes_read = 0;
+    file = fopen(file_name.c_str(), "r");
     
     if(file == NULL) {
         httpd_resp_send_404(req);
@@ -52,7 +54,7 @@ httpd_uri_t gnss = {
     .user_ctx  = (void*)"/spiffs/index.html"
 };
 
-httpd_uri_t clock = {
+httpd_uri_t clocks = {
     .uri       = "/clock",
     .method    = HTTP_GET,
     .handler   = get_handler,
@@ -81,10 +83,10 @@ httpd_uri_t dashboard = {
 };
 
 httpd_uri_t style = {
-    .uri       = "/style.css",
+    .uri       = "/main.css",
     .method    = HTTP_GET,
     .handler   = get_handler,
-    .user_ctx  = (void*)"/spiffs/style.css"
+    .user_ctx  = (void*)"/spiffs/main.css"
 };
 
 httpd_uri_t bundle = {
@@ -107,7 +109,7 @@ HttpServer::HttpServer() {
         httpd_register_uri_handler(server, &dashboard);
         httpd_register_uri_handler(server, &tuner);
         httpd_register_uri_handler(server, &settings);
-        httpd_register_uri_handler(server, &clock);
+        httpd_register_uri_handler(server, &clocks);
         httpd_register_uri_handler(server, &gnss);
         httpd_register_uri_handler(server, &style);
         httpd_register_uri_handler(server, &bundle);

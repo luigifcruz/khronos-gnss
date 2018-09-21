@@ -23,7 +23,7 @@ let defaultState = {
 const middleware = [ ]
 
 if (process.env.NODE_ENV == 'development') {
-    middleware.push(createLogger())
+    //middleware.push(createLogger())
 }
 
 function configureStore(initialState = defaultState) {

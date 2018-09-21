@@ -13,7 +13,7 @@ void ApiServer::DeltaResponder(char* key, char* zone, void* value) {
     if (((Database*)value)->GetSettings().serial_tx_active) {
         ApiServer::BroadcastSerial(delta);
     }
-    //printf("Free Memory: %d\n", xPortGetFreeHeapSize());
+    
     ws_server_send_text_all_from_callback(delta, strlen(delta));
     free(delta);
 }
@@ -141,6 +141,6 @@ ApiServer::ApiServer(Database* db) {
     this->db->RegisterNotifier((char*)"socket", &this->DeltaResponder);
 
     ws_server_start(db);
-    xTaskCreate(ApiServer::ServerHandleTask, "ServerHandleTask", 3000, db, 9, NULL);
-    xTaskCreate(ApiServer::ServerHandleQueue, "ServerHandleQueue", 4000, db, 6, NULL);
+    xTaskCreatePinnedToCore(ApiServer::ServerHandleTask, "ServerHandleTask", 3000, db, 9, NULL, 0);
+    xTaskCreatePinnedToCore(ApiServer::ServerHandleQueue, "ServerHandleQueue", 4000, db, 6, NULL, 0);
 }

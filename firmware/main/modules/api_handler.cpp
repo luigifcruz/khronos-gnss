@@ -21,6 +21,11 @@ char* ApiHandler::Response(char* key, char* zone, Database* db) {
     } else {
         cJSON_AddItemToObject(res, "method", cJSON_CreateString("delta_update"));
     }
+
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    uint64_t timestamp = tv.tv_sec*(uint64_t)1000000+tv.tv_usec;;
+    cJSON_AddItemToObject(res, "timestamp", cJSON_CreateString((char*)std::to_string(timestamp).c_str()));
     
     changes = cJSON_AddArrayToObject(res, "changes");
 

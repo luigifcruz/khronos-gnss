@@ -99,6 +99,6 @@ NtpServer::NtpServer() {
     static NtpHandler ntp;
 
     this->InitCoprocessor();
-    xTaskCreate(NtpServer::UdpHandler, "UdpHandler", 2*4096, &ntp, 1, NULL); 
+    xTaskCreatePinnedToCore(NtpServer::UdpHandler, "UdpHandler", 2*4096, &ntp, 1, NULL, 1); 
 }
 

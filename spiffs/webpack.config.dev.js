@@ -1,47 +1,67 @@
 const webpack = require('webpack');
-const config = require('konfig')({ path: "./" });
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const path = require('path');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CompressionWebpackPlugin = require('compression-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const DelWebpackPlugin = require('del-webpack-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
-module.exports = [{
-    devtool: 'inline-source-map',
+const ROOT_DIR = path.resolve(__dirname, '../');
+const DIST_DIR = path.resolve(ROOT_DIR, 'spiffs/dist');
+
+const prodConfig = {
+    mode: 'development',
+    target: 'web',
     entry: './src/client/client.js',
     output: {
-        path: "./dist",
+        path: DIST_DIR,
         filename: 'bundle.js'
     },
     module: {
-        loaders: [{
-            test: /\.js$/,
-            loader: 'babel-loader',
-            exclude: /node_modules/,
-            query: {
-                babelrc: false,
-                presets: ['react', 'es2015']
+        rules: [{
+            test: /\.(sa|sc|c)ss$/,
+            use: [
+                MiniCssExtractPlugin.loader,
+                'css-loader',
+                'sass-loader',
+            ],
+        },{
+            test: /\.(js|jsx)$/,
+            loader: "babel-loader",
+            exclude: /(node_modules)/,
+            options: {
+                presets: ['@babel/react', '@babel/env']
             }
-        },{
-            test: /\.css$/,
-            loader: ExtractTextPlugin.extract("style-loader", "css-loader")
-        },{
-            test: /\.scss$/,
-            loader: ExtractTextPlugin.extract("style-loader", "css-loader!sass-loader")
         }]
     },
+    optimization: {
+        minimizer: [
+          new UglifyJsPlugin({
+            cache: true
+          })
+        ]
+    },
     plugins: [
-    new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.NoErrorsPlugin(),
-    new ExtractTextPlugin("style.css"),
-    new webpack.DefinePlugin({
-        'process.env': {
-            'NODE_ENV': JSON.stringify('development')
-        }
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-        compress: {
-            warnings: false,
-        },
-        output: {
-            comments: false,
-        },
-    })
-  ]
-}];
+        new MiniCssExtractPlugin({
+            filename: "[name].css",
+            allChunks: false
+        }),
+        new CompressionWebpackPlugin({
+            filename: '[path].gz[query]',
+            algorithm: 'gzip',
+            test: new RegExp('\\.(js|scss)$'),
+            cache: true
+        }),
+        new DelWebpackPlugin({
+          include: ['bundle.js'],
+          keepGeneratedAssets: false,
+          info: true,
+        })
+    ]
+};
+
+if (process.env.NODE_ANALYZE) {
+  prodConfig.plugins.push(new BundleAnalyzerPlugin());
+}
+
+module.exports = prodConfig;

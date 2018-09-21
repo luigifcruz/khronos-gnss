@@ -3,7 +3,6 @@
 
 #include <cstring>
 #include <string>
-#include <iostream>
 
 #include "esp_event_loop.h"
 #include "esp_system.h"

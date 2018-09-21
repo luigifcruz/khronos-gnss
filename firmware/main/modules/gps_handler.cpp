@@ -74,7 +74,7 @@ void GpsHandler::ParseNMEA(char* line, void* pvParameters, time_t* then) {
                 tm.tm_min = frame.time.minutes - frame.minute_offset;
                 tm.tm_sec = frame.time.seconds;
 
-                if (now-*then > 60 || now < 50) {
+                if ((now-*then) >= 60 || now < 100) {
                     const struct timeval tv = {mktime(&tm), 0};
                     settimeofday(&tv, 0);
                     *then = now;
@@ -82,6 +82,7 @@ void GpsHandler::ParseNMEA(char* line, void* pvParameters, time_t* then) {
                     char strftime_buf[64];
                     strftime(strftime_buf, sizeof(strftime_buf), "%FT%TZ", &tm);
                     ESP_LOGI(CONFIG_SN, "[GPS] Time updated to %s", strftime_buf);
+                    ESP_LOGI(CONFIG_SN, "[SYSTEM] Free Memory: %d", xPortGetFreeHeapSize());
                 }
             }
         } break;
@@ -95,13 +96,18 @@ void GpsHandler::ParseNMEA(char* line, void* pvParameters, time_t* then) {
 void GpsHandler::ProgramUBX() {
     const char ubx_enable_zda[] = {0x24, 0x45, 0x49, 0x47, 0x50, 0x51, 0x2c, 0x5a, 0x44, 0x41, 0x2a, 0x33, 0x39, 0x0d, 0x0a, 0xb5, 0x62, 0x06, 0x01, 0x03, 0x00, 0xf0, 0x08, 0x01, 0x03, 0x20};
     uart_write_bytes(UART_NUM_2, (const char *)&ubx_enable_zda, sizeof(ubx_enable_zda));
+    uart_wait_tx_done(UART_NUM_2, 1000);
 
     //const char ubx_10hz_update[] = {0xb5, 0x62, 0x06, 0x08, 0x06, 0x00, 0x64, 0x00, 0x01, 0x00, 0x01, 0x00, 0x7A, 0x12};
     //uart_write_bytes(UART_NUM_2, (const char *)&ubx_10hz_update, sizeof(ubx_10hz_update));
+    //uart_wait_tx_done(UART_NUM_2, 1000);
 
-    //const char ubx_enable_fast[] = {0xb5, 0x62, 0x06, 0x00, 0x14, 0x00, 0x01, 0x00, 0x00, 0x00, 0xd0, 0x08, 0x00, 0x00, 0x00, 0xc2, 0x01, 0x00, 0x07, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc4, 0x96, 0xb5, 0x62, 0x06, 0x00, 0x01, 0x00, 0x01, 0x08, 0x22};
-    //uart_write_bytes(UART_NUM_2, (const char *)&ubx_enable_fast, sizeof(ubx_enable_fast));
-    //uart_set_baudrate(UART_NUM_2, 115200);
+    const char ubx_enable_fast[] = {0xb5, 0x62, 0x06, 0x00, 0x14, 0x00, 0x01, 0x00, 0x00, 0x00, 0xd0, 0x08, 0x00, 0x00, 0x00, 0xc2, 0x01, 0x00, 0x07, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc4, 0x96, 0xb5, 0x62, 0x06, 0x00, 0x01, 0x00, 0x01, 0x08, 0x22};
+    uart_write_bytes(UART_NUM_2, (const char *)&ubx_enable_fast, sizeof(ubx_enable_fast));
+    uart_wait_tx_done(UART_NUM_2, 1000);
+
+    uart_set_baudrate(UART_NUM_2, 115200);
+    uart_flush(UART_NUM_2);
 
     ESP_LOGI(CONFIG_SN, "[GPS] UBX module programmed.");
 }
@@ -122,6 +128,7 @@ void GpsHandler::GpsChannel(void* pvParameters) {
     uart_driver_install(UART_NUM_2, NMEA_BUF_SIZE * 2, 0, 0, NULL, 0);
 
     GpsHandler::ProgramUBX();
+    vTaskDelay(100);
 
     while (1) {
         char *line = readLine(UART_NUM_2);
@@ -134,5 +141,5 @@ GpsHandler::GpsHandler(Database* db) {
     ESP_LOGI(CONFIG_SN, "[GPS] Service Stated...");
 
     this->db = db;
-    xTaskCreate(GpsHandler::GpsChannel, "GpsChannel", 4096, db, 1, NULL);
+    xTaskCreatePinnedToCore(GpsHandler::GpsChannel, "GpsChannel", 4096, db, 2, NULL, 1);
 }
