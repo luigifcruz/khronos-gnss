@@ -1,5 +1,5 @@
-import React, { Component, PropTypes } from 'react'
-import { Link } from 'react-router'
+import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
 import '../styles/Dashboard.scss'
 
 class Dashboard extends Component {

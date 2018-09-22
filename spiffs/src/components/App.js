@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import { withRouter } from 'react-router-dom'
+import React, { Component } from 'react'
 import Websocket from 'react-websocket'
 import * as rxa from '../redux/actions'
 import { connect } from 'react-redux'
@@ -56,4 +57,4 @@ class App extends Component {
 }
 
 App.propTypes = rxa.props
-export default connect(rxa.mapStateToProps)(App)
+export default withRouter(connect(rxa.mapStateToProps)(App))

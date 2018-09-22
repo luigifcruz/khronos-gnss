@@ -1,4 +1,7 @@
-import React, { Component, PropTypes } from 'react'
+import HeatmapLayer from "react-google-maps/lib/components/visualization/HeatmapLayer";
+import { TimeSeries, Index, TimeEvent, TimeRange } from "pondjs";
+import React, { Component } from 'react'
+import { compose, withProps } from 'recompose'
 import * as rxa from '../redux/actions'
 import { connect } from 'react-redux'
 import '../styles/Gnss.scss'
@@ -14,55 +17,88 @@ import {
     Charts
 } from "react-timeseries-charts";
 
-import { TimeSeries, Index, TimeEvent, TimeRange, Stream } from "pondjs";
+import {
+  withScriptjs,
+  withGoogleMap,
+  GoogleMap,
+  Marker
+} from "react-google-maps";
+
+const MyMapComponent = compose(
+  withProps({
+    googleMapURL: "https://maps.googleapis.com/maps/api/js?key=AIzaSyA8-WppouVH_aiun-Poq89TAxhRhIj1y4Y&libraries=visualization",
+    loadingElement: <div style={{ height: `100%` }} />,
+    containerElement: <div style={{ height: `400px` }} />,
+    mapElement: <div style={{ height: `100%` }} />,
+  }),
+  withScriptjs,
+  withGoogleMap
+)((props) =>
+    <GoogleMap
+        defaultZoom={16} 
+        options={{ scrollwheel: true }} 
+        defaultCenter={{ lat: props.lat, lng: props.lng }} >
+        <Marker position={{ lat: props.lat, lng: props.lng }} />
+        <HeatmapLayer data={props.loc.toArray()}/>
+    </GoogleMap>
+)
 
 class Gnss extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            events: new Ring(2000),
-            gnss: new Ring(2000),
-            stream: new Stream(),
+            altitude: new Ring(2000),
+            speed: new Ring(2000),
+            location: new Ring(100),
             firstEvent: 0,
             lastEvent: 0
         };
     }
 
-    componentDidUpdate(prevProps) {
-        if (prevProps.state.altitude !== this.props.state.altitude) {
-            console.log("Altitude changed!");
-            let event = new TimeEvent(Date.now(), Number(this.props.state.altitude));
+    digestData() {
+        let { state } = this.props;
 
-            const newEvents = this.state.events;
-            newEvents.push(event);
-            this.setState({ events: newEvents, lastEvent: Date.now() });
+        const { altitude } = this.state;
+        altitude.push(new TimeEvent(Date.now(), state.altitude));
+        this.setState({ altitude });
 
-            let event2 = new TimeEvent(Date.now(), Number(this.props.state.gnss_fix_quality));
+        const { speed } = this.state;
+        speed.push(new TimeEvent(Date.now(), state.ground_speed));
+        this.setState({ speed });
 
-            const newEvents2 = this.state.gnss;
-            newEvents2.push(event2);
-            this.setState({ gnss: newEvents2});
+        const { location } = this.state;
+        const htmapPoint = {
+            location: new google.maps.LatLng(
+                state.latitude,
+                state.longitude
+            ), 
+            weight: 1
+        };
+        location.push(htmapPoint);
+        this.setState({ location });
 
-            if (this.state.firstEvent == 0) {
-                this.setState({ firstEvent: Date.now() });
-            }
-        }
+        this.setState({ lastEvent: Date.now() });
     }
 
     componentDidMount() {
+        this.setState({ firstEvent: Date.now() });
+        this.timer = setInterval(() => { this.digestData() }, 1000)
+    }
 
+    componentWillUnmount() {
+        clearInterval(this.timer);
     }
 
     render() {
-        const series = new TimeSeries({
+        const altitude = new TimeSeries({
             name: "raw",
-            events: this.state.events.toArray()
+            events: this.state.altitude.toArray()
         });
 
-        const series2 = new TimeSeries({
+        const speed = new TimeSeries({
             name: "raw",
-            events: this.state.gnss.toArray()
+            events: this.state.speed.toArray()
         });
 
         const timeRange = new TimeRange(this.state.firstEvent, this.state.lastEvent);
@@ -70,8 +106,8 @@ class Gnss extends Component {
         return (
             <div>
                 <h3>GNSS Dashboard</h3>
-                <p>Latitude: {(this.props.state.latitude*1.1231).toFixed(6)}</p>
-                <p>Longitude: {(this.props.state.longitude*1.1231).toFixed(6)}</p>
+                <p>Latitude: {this.props.state.latitude}</p>
+                <p>Longitude: {this.props.state.longitude}</p>
                 <p>True North (d): {this.props.state.true_north}</p>
                 <p>Ground Speed (kph): {this.props.state.ground_speed}</p>
                 <p>Altitude (m): {this.props.state.altitude}</p>
@@ -82,26 +118,46 @@ class Gnss extends Component {
                 <p>GLONASS Satellites Count: {this.props.state.sat_count_glonass}</p>
                 <br></br>
                 <ChartContainer 
-                    title="Altitude over Time"
+                    title="Altitude"
                     format="relative"
                     timeRange={timeRange}>
                     <ChartRow height="150">
                         <YAxis
                             id="y"
-                            min={series.min()}
-                            max={series.max()}
+                            min={altitude.min()}
+                            max={altitude.max()}
                             label="Altitude (m)"
                             format=".1f"
                             type="linear"/>
                         <Charts>
-                            <Baseline axis="y" value={series.max()} label="Max"/>
-                            <Baseline axis="y" value={series.min()} label="Min"/>
-                            <LineChart axis="y" series={series} />
-                            <Baseline axis="y" value={series.avg()} label="Avg"/>
-                            <EventChart series={series2} label="DGNSS" />
+                            <Baseline axis="y" value={altitude.max()} label="Max"/>
+                            <Baseline axis="y" value={altitude.min()} label="Min"/>
+                            <LineChart axis="y" series={altitude} />
+                            <Baseline axis="y" value={altitude.avg()} label="Avg"/>
                         </Charts>
                     </ChartRow>
                 </ChartContainer>
+                <ChartContainer 
+                    title="Ground Speed"
+                    format="relative"
+                    timeRange={timeRange}>
+                    <ChartRow height="150">
+                        <YAxis
+                            id="y"
+                            min={speed.min()}
+                            max={speed.max()}
+                            label="Ground Speed (kph)"
+                            format=".1f"
+                            type="linear"/>
+                        <Charts>
+                            <LineChart axis="y" series={speed} />
+                        </Charts>
+                    </ChartRow>
+                </ChartContainer>
+                <MyMapComponent
+                    lat={this.props.state.latitude}
+                    lng={this.props.state.longitude}
+                    loc={this.state.location} />
             </div>
         )
     }

@@ -4,7 +4,7 @@ import {
 } from "./actions"
 
 function trigger(key, value, action) {
-    return (action.key == key) ? action.value : value;
+    return Number((action.key == key) ? action.value : value);
 }
 
 export default function reducer(state, action) {
