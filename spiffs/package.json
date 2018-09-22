@@ -31,6 +31,7 @@
         "react-websocket": "^2.0.0",
         "redux": "^3.5.2",
         "redux-logger": "^2.7.0",
+        "ringjs": "0.0.1",
         "style-loader": "^0.13.1",
         "superagent": "^2.0.0-alpha.3"
     },

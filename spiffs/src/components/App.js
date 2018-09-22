@@ -45,7 +45,7 @@ class App extends Component {
     render() {
         return (
             <div>
-            	<Websocket url='ws://10.10.1.7:8080/api/stream' onOpen= {this.handleEvent.bind(this)} onMessage={this.handleData.bind(this)}/>
+            	<Websocket url='ws://khronos.local:8080/api/stream' onOpen= {this.handleEvent.bind(this)} onMessage={this.handleData.bind(this)}/>
                 <p>LED Status: {this.props.settings.led_status}</p>
                 <p>Serial TX Status: {this.props.settings.serial_tx_active}</p>
                 {this.props.children}
