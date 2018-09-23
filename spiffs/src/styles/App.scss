@@ -1,11 +1,19 @@
 body {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Roboto Slab', serif;
     font-weight: 400;
-    background-color: white;
-    
-    p {
-    	margin: 0em !important;
-    }
+    background-color: $background-color;
+    width: 80%;
+    margin-left: 10%;
 
     -webkit-font-smoothing: antialiased;
+}
+
+.App {
+    h1 {
+        font-size: 2.5em;
+        color: $khronos-green;
+        font-weight: 700;
+        margin-bottom: 0em;
+        margin-top: 0.35em;
+    }
 }

@@ -1,18 +1,19 @@
 const webpack = require('webpack');
 const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CompressionWebpackPlugin = require('compression-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const DelWebpackPlugin = require('del-webpack-plugin');
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 const ROOT_DIR = path.resolve(__dirname, '../');
 const DIST_DIR = path.resolve(ROOT_DIR, 'spiffs/dist');
 
-const prodConfig = {
+const devConfig = {
     mode: 'development',
     target: 'web',
-    entry: './src/client/client.js',
+    devtool: 'inline-source-map',
+    entry: [
+        'react-hot-loader/patch',
+        'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000',
+        './src/client/index.js'
+    ],
     output: {
         path: DIST_DIR,
         filename: 'bundle.js'
@@ -21,9 +22,18 @@ const prodConfig = {
         rules: [{
             test: /\.(sa|sc|c)ss$/,
             use: [
+                'css-hot-loader',
                 MiniCssExtractPlugin.loader,
                 'css-loader',
                 'sass-loader',
+                {
+                    loader: 'sass-resources-loader',
+                    options: {
+                        resources: [
+                            path.resolve(ROOT_DIR, 'spiffs/src/styles/Resources.scss')
+                        ],
+                    },
+                },
             ],
         },{
             test: /\.(js|jsx)$/,
@@ -34,34 +44,17 @@ const prodConfig = {
             }
         }]
     },
-    optimization: {
-        minimizer: [
-          new UglifyJsPlugin({
-            cache: true
-          })
-        ]
-    },
     plugins: [
         new MiniCssExtractPlugin({
             filename: "[name].css",
             allChunks: false
         }),
-        new CompressionWebpackPlugin({
-            filename: '[path].gz[query]',
-            algorithm: 'gzip',
-            test: new RegExp('\\.(js|scss)$'),
-            cache: true
+        new webpack.NamedModulesPlugin(),
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify('production')
         }),
-        new DelWebpackPlugin({
-          include: ['bundle.js'],
-          keepGeneratedAssets: false,
-          info: true,
-        })
     ]
 };
 
-if (process.env.NODE_ANALYZE) {
-  prodConfig.plugins.push(new BundleAnalyzerPlugin());
-}
-
-module.exports = prodConfig;
+module.exports = devConfig;

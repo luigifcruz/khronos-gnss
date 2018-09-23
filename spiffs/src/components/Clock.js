@@ -5,7 +5,7 @@ class Clock extends Component {
 
     render() {
         return (
-        	<p>Clock</p>
+            <p>Clock</p>
         )
     }
 

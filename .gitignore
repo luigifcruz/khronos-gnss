@@ -8,3 +8,4 @@ npm-debug.log
 bundle.js
 bundle.js.gz
 main.css
+.DS_Store

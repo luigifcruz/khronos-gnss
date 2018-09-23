@@ -9,7 +9,7 @@ import '../styles/App.scss'
 class App extends Component {
 
 	constructor(props) {
-      super(props);
+        super(props);
     }
 
     parseStream(payload) {
@@ -45,10 +45,9 @@ class App extends Component {
 
     render() {
         return (
-            <div>
+            <div className="App">
             	<Websocket url='ws://khronos.local:8080/api/stream' onOpen= {this.handleEvent.bind(this)} onMessage={this.handleData.bind(this)}/>
-                <p>LED Status: {this.props.settings.led_status}</p>
-                <p>Serial TX Status: {this.props.settings.serial_tx_active}</p>
+                <h1>Khronos</h1>
                 {this.props.children}
             </div>
         )

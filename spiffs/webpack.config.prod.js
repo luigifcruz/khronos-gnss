@@ -12,7 +12,7 @@ const DIST_DIR = path.resolve(ROOT_DIR, 'spiffs/dist');
 const prodConfig = {
     mode: 'production',
     target: 'web',
-    entry: './src/client/client.js',
+    entry: './src/client/index.js',
     output: {
         path: DIST_DIR,
         filename: 'bundle.js'
@@ -24,6 +24,14 @@ const prodConfig = {
                 MiniCssExtractPlugin.loader,
                 'css-loader',
                 'sass-loader',
+                {
+                    loader: 'sass-resources-loader',
+                    options: {
+                        resources: [
+                            path.resolve(ROOT_DIR, 'spiffs/src/styles/Resources.scss')
+                        ],
+                    },
+                },
             ],
         },{
             test: /\.(js|jsx)$/,
@@ -33,23 +41,6 @@ const prodConfig = {
                 presets: ['@babel/react', '@babel/env']
             }
         }]
-    },
-    optimization: {
-        minimizer: [
-          new UglifyJsPlugin({
-            cache: true,
-            uglifyOptions: {
-                warnings: false,
-                console: false,
-                mangle: true,
-                output: null,
-                toplevel: false,
-                nameCache: null,
-                ie8: false,
-                keep_fnames: false,
-            }
-          })
-        ]
     },
     plugins: [
         new MiniCssExtractPlugin({
@@ -63,15 +54,15 @@ const prodConfig = {
             cache: true
         }),
         new DelWebpackPlugin({
-          include: ['bundle.js'],
-          keepGeneratedAssets: false,
-          info: true,
+            exclude: ['bundle.js.gz', 'index.html', 'main.css'],
+            keepGeneratedAssets: false,
+            info: true,
         })
     ]
 };
 
 if (process.env.NODE_ANALYZE) {
-  prodConfig.plugins.push(new BundleAnalyzerPlugin());
+    prodConfig.plugins.push(new BundleAnalyzerPlugin());
 }
 
 module.exports = prodConfig;
