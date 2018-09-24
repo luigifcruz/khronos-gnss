@@ -4,7 +4,9 @@ esp_err_t get_handler(httpd_req_t *req) {
     std::string file_name = std::string((char*)req->user_ctx);
 
     if (strstr((char*)req->uri, ".css")) {
+        httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
         httpd_resp_set_type(req, "text/css");
+        file_name.append(".gz");
     } else if (strstr((char*)req->uri, ".js")) {
         httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
         httpd_resp_set_type(req, "text/javascript");

@@ -24,8 +24,11 @@ app.get('/bundle.js', (req, res) => {
     res.sendFile(path.join(__dirname, "dist/bundle.js.gz"));
 })
 
-app.get('/main.css', (req, res) => {   
-    res.sendFile(path.join(__dirname, "dist/main.css"));
+app.get('/main.css', (req, res) => {
+    req.url = req.url + '.gz';
+    res.set('Content-Encoding', 'gzip');
+    res.set('Content-Type', 'text/css');  
+    res.sendFile(path.join(__dirname, "dist/main.css.gz"));
 })
 
 app.get('/*', (req, res) => {   

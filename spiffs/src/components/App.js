@@ -3,14 +3,12 @@ import React, { Component } from 'react'
 import Websocket from 'react-websocket'
 import * as rxa from '../redux/actions'
 import { connect } from 'react-redux'
+import { TimeEvent } from 'pondjs'
 import request from 'superagent'
+
 import '../styles/App.scss'
 
 class App extends Component {
-
-	constructor(props) {
-        super(props);
-    }
 
     parseStream(payload) {
         if (payload.method == "bulk_update") {
@@ -43,10 +41,26 @@ class App extends Component {
         console.log("[STREAM] Connected to Khronos via WebSocket.");
     }
 
+    componentDidMount() {
+        this.timer = setInterval(() => { 
+            this.props.dispatch(rxa.updateHistory(new TimeEvent(new Date(), this.props.state)));
+
+            let { latitude, longitude } = this.props.state;
+            this.props.dispatch(rxa.updateMapdata({
+                location: new google.maps.LatLng(latitude, longitude), 
+                weight: 1
+            }));
+        }, 1000)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.timer);
+    }
+
     render() {
         return (
             <div className="App">
-            	<Websocket url='ws://khronos.local:8080/api/stream' onOpen= {this.handleEvent.bind(this)} onMessage={this.handleData.bind(this)}/>
+            	<Websocket url='ws://khronos.local:8080/api/stream' onOpen={this.handleEvent.bind(this)} onMessage={this.handleData.bind(this)}/>
                 <h1>Khronos</h1>
                 {this.props.children}
             </div>

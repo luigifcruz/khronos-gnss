@@ -1,9 +1,18 @@
-$background-color: #FEFFFE;
 $khronos-green: #087E8B;
-$light-detail: #CFCFCF;
-$subtitle: #2C2C2C;
-$filler_color: #F1F1F1;
+
+$heavy-text: #493E44;
+
+$light-text: #7D7979;
+$light-filler: #F1F1F1;
+
+$background-color: #FEFFFE;
 
 .NoHover {
 	pointer-events: none;
+}
+
+.Unbuttonfy {
+	outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }

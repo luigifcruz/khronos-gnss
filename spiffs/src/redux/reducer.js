@@ -1,6 +1,10 @@
+import Ring from "ringjs"
+
 import {
     UPDATE_STATE,
-    UPDATE_SETTINGS
+    UPDATE_SETTINGS,
+    UPDATE_HISTORY,
+    UPDATE_MAPDATA
 } from "./actions"
 
 function trigger(key, value, action) {
@@ -31,6 +35,14 @@ export default function reducer(state, action) {
                 serial_tx_active: trigger("serial_tx_active", state.settings.serial_tx_active, action)
             })
         });
+
+        case UPDATE_HISTORY:
+        state.history.push(action.value);
+        return state;
+
+        case UPDATE_MAPDATA:
+        state.mapdata.push(action.value);
+        return state;
 
         default:
         return state;

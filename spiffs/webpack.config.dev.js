@@ -9,6 +9,9 @@ const devConfig = {
     mode: 'development',
     target: 'web',
     devtool: 'inline-source-map',
+    performance: {
+        hints: false
+    },
     entry: [
         'react-hot-loader/patch',
         'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000',

@@ -1,6 +1,6 @@
 .Gnss {
     h2 {
-        color: $subtitle;
+        color: $heavy-text;
         font-size: 1.5em;
         font-weight: 700;
         margin-top: 0em;
@@ -10,24 +10,19 @@
     hr {
         background-color: $background-color;
         border: none;
-        border-top: 2px dashed $light-detail;
+        border-top: 2px dashed $light-filler;
     }
 
     .Map {
         border-radius: 10px;
         overflow: hidden;
         height: 380px;
-        background-color: $filler_color;
+        background-color: $light-filler;
     }
 
     .Variables {
         margin-top: 0.5em;
         margin-bottom: 1.5em;
-    }
-
-    .Chart {
-        width: 100%;
-        background-color: yellow;
     }
 
     .FloatWide {
@@ -42,7 +37,7 @@
         p {
             font-family: 'Roboto Mono', monospace;
             font-weight: 500;
-            color: #493E44;
+            color: $heavy-text;
             font-size: 3em;
             margin: 0em;
             width: 100%;
@@ -52,7 +47,7 @@
         h5 {
             font-size: 0.90em;
             font-weight: 600;
-            color: #7D7979;
+            color: $light-text;
             margin: 0;
             width: 100%;
             text-align: right;
@@ -60,7 +55,7 @@
     }
 
     .FloatWide:hover {
-        background-color: $filler_color;
+        background-color: $light-filler;
         cursor: pointer;
     }
 
@@ -72,5 +67,27 @@
     .FloatTiny {
         @extend .FloatWide;
         width: 13%;
+    }
+
+    button {
+        @extend .Unbuttonfy;
+        cursor: pointer;
+        width: 6em;
+        height: 2.5em;
+        font-weight: 700;
+        font-size: 1em;
+        color: #594F55;
+        background-color: #DBDFE5;
+        border: none;
+        border-radius: 0.75em;
+        margin-right: 1em;
+        margin-top: 1em;
+        transition: all 0.05s ease-in-out;
+    }
+
+    .Active {
+        color: white;
+        background-color: #493E44;
+        transition: all 0.05s ease-in-out;
     }
 }

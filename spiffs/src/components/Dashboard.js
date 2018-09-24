@@ -8,9 +8,9 @@ class Dashboard extends Component {
         return (
             <div className="Dashboard">
                 <p>Welcome to Khronos!</p>
-                <Link to="/gnss">GNSS Dashboard</Link>
-                <Link to="/tuner">Frequency Tuner</Link>
-                <Link to="/clock">NTP Clock</Link>
+                <Link to="/gnss">Navigation</Link>
+                <Link to="/tuner">Tuner</Link>
+                <Link to="/clock">Clock</Link>
                 <Link to="/settings">Settings</Link>
             </div>
         )

@@ -1,8 +1,11 @@
 import { createStore, applyMiddleware } from 'redux'
 import Reducer from './reducer'
 import createLogger from 'redux-logger'
+import Ring from "ringjs"
 
 let defaultState = {
+    'history': new Ring(1000),
+    'mapdata': new Ring(500),
     'state': {
     	'gnss_fix_quality': 0,
     	'gnss_fix_type': 0,
@@ -23,7 +26,7 @@ let defaultState = {
 const middleware = [ ]
 
 if (process.env.NODE_ENV == 'development') {
-    //middleware.push(createLogger())
+    middleware.push(createLogger())
 }
 
 function configureStore(initialState = defaultState) {

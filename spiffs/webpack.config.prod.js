@@ -17,6 +17,9 @@ const prodConfig = {
         path: DIST_DIR,
         filename: 'bundle.js'
     },
+    performance: {
+        hints: false
+    },
     module: {
         rules: [{
             test: /\.(sa|sc|c)ss$/,
@@ -50,11 +53,11 @@ const prodConfig = {
         new CompressionWebpackPlugin({
             filename: '[path].gz[query]',
             algorithm: 'gzip',
-            test: new RegExp('\\.(js|scss)$'),
+            test: new RegExp('\\.(js|css)$'),
             cache: true
         }),
         new DelWebpackPlugin({
-            exclude: ['bundle.js.gz', 'index.html', 'main.css'],
+            exclude: ['bundle.js.gz', 'index.html', 'main.css.gz'],
             keepGeneratedAssets: false,
             info: true,
         })
