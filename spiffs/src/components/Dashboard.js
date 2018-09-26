@@ -10,7 +10,7 @@ class Dashboard extends Component {
                 <p>Welcome to Khronos!</p>
                 <Link to="/gnss">Navigation</Link>
                 <Link to="/tuner">Tuner</Link>
-                <Link to="/clock">Clock</Link>
+                <Link to="/clock">Time & Date</Link>
                 <Link to="/settings">Settings</Link>
             </div>
         )

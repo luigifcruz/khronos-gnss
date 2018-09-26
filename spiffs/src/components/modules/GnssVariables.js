@@ -68,7 +68,7 @@ class Variables extends Component {
                     </CopyToClipboard>
                     <CopyToClipboard text={this.props.state.latitude}>
                         <div className="FloatWide">
-                            <p>{this.props.state.latitude.toFixed(6)}</p>
+                            <p>{(this.props.state.latitude*1.132).toFixed(6)}</p>
                             <h5>LATITUDE</h5>
                         </div>
                     </CopyToClipboard>
@@ -90,7 +90,7 @@ class Variables extends Component {
                     </CopyToClipboard>
                     <CopyToClipboard text={this.props.state.longitude}>
                         <div className="FloatWide">
-                            <p>{this.props.state.longitude.toFixed(6)}</p>
+                            <p>{(this.props.state.longitude*1.231).toFixed(6)}</p>
                             <h5>LONGITUDE</h5>
                         </div>
                     </CopyToClipboard>

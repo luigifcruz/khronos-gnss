@@ -1,12 +1,4 @@
 .Gnss {
-    h2 {
-        color: $heavy-text;
-        font-size: 1.5em;
-        font-weight: 700;
-        margin-top: 0em;
-        margin-bottom: 0.65em;
-    }
-
     hr {
         background-color: $background-color;
         border: none;
@@ -16,13 +8,13 @@
     .Map {
         border-radius: 10px;
         overflow: hidden;
-        height: 380px;
+        height: 62vh;
         background-color: $light-filler;
     }
 
     .Variables {
         margin-top: 0.5em;
-        margin-bottom: 1.5em;
+        margin-bottom: 2em;
     }
 
     .FloatWide {
@@ -72,7 +64,7 @@
     button {
         @extend .Unbuttonfy;
         cursor: pointer;
-        width: 6em;
+        width: 8em;
         height: 2.5em;
         font-weight: 700;
         font-size: 1em;
@@ -83,6 +75,10 @@
         margin-right: 1em;
         margin-top: 1em;
         transition: all 0.05s ease-in-out;
+    }
+
+    .Small {
+        width: 6em;
     }
 
     .Active {

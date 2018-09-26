@@ -16,3 +16,8 @@ $background-color: #FEFFFE;
     -webkit-appearance: none;
     -moz-appearance: none;
 }
+
+.Unbuttonfy::-moz-focus-inner {
+  border: 0;
+}
+

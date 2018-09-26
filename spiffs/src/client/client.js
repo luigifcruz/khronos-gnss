@@ -5,7 +5,7 @@ import { configureStore } from '../redux/store'
 
 import App from '../components/App'
 import Dashboard from '../components/Dashboard'
-import Clock from '../components/Clock'
+import TimeDate from '../components/TimeDate'
 import Gnss from '../components/Gnss'
 import Settings from '../components/Settings'
 import Tuner from '../components/Tuner'
@@ -20,7 +20,7 @@ export default class Client extends Component {
                     <App>
                         <Switch>
                             <Route exact path="/" component={Dashboard}/>
-                            <Route path="/clock" component={Clock}/>
+                            <Route path="/clock" component={TimeDate}/>
                             <Route path="/gnss" component={Gnss}/>
                             <Route path="/settings" component={Settings}/>
                             <Route path="/tuner" component={Tuner}/>

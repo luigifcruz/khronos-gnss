@@ -15,7 +15,7 @@ const MapComponent = compose(
     withProps({
         googleMapURL,
         loadingElement: <div style={{ height: '100%' }} />,
-        containerElement: <div style={{ height: '380px' }} />,
+        containerElement: <div style={{ height: '100%' }} />,
         mapElement: <div style={{ height: '100%' }} />,
     }),
     withScriptjs,

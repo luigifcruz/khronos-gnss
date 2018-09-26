@@ -2,6 +2,7 @@ import { withRouter } from 'react-router-dom'
 import React, { Component } from 'react'
 import Websocket from 'react-websocket'
 import * as rxa from '../redux/actions'
+import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { TimeEvent } from 'pondjs'
 import request from 'superagent'
@@ -35,6 +36,20 @@ class App extends Component {
         if (payload.type == "broadcast") {
             this.parseStream(payload)
         }
+
+        if (payload.type == "heartbeat") {
+            this.updateState()
+        }
+    }
+
+    updateState() {
+        this.props.dispatch(rxa.updateHistory(new TimeEvent(new Date(), this.props.state)));
+
+        let { latitude, longitude } = this.props.state;
+        this.props.dispatch(rxa.updateMapdata({
+            location: new google.maps.LatLng(latitude, longitude), 
+            weight: 1
+        }));
     }
 
     handleEvent(data) {
@@ -43,13 +58,7 @@ class App extends Component {
 
     componentDidMount() {
         this.timer = setInterval(() => { 
-            this.props.dispatch(rxa.updateHistory(new TimeEvent(new Date(), this.props.state)));
-
-            let { latitude, longitude } = this.props.state;
-            this.props.dispatch(rxa.updateMapdata({
-                location: new google.maps.LatLng(latitude, longitude), 
-                weight: 1
-            }));
+            this.updateState()
         }, 1000)
     }
 
@@ -61,7 +70,7 @@ class App extends Component {
         return (
             <div className="App">
             	<Websocket url='ws://khronos.local:8080/api/stream' onOpen={this.handleEvent.bind(this)} onMessage={this.handleData.bind(this)}/>
-                <h1>Khronos</h1>
+                <Link to="/" className="Khronos">Khronos</Link>
                 {this.props.children}
             </div>
         )

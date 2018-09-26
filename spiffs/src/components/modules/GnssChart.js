@@ -76,16 +76,19 @@ class Chart extends Component {
     }
 
     handleExport() {
-        let data = this.plot_data.toJSON().points;
-        data.unshift(this.plot_data.toJSON().columns);
-        let fn = `khronos_export_${data[2][0]}_${data[data.length-1][0]}.csv`
-        let f = new File([csvFormat(data)], fn, {type: "text/csv"});
-        let a = window.document.createElement('a');
-        a.href = window.URL.createObjectURL(f);
-        a.download = fn;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        new Promise((resolve, reject) => {
+            let jsonData = this.plot_data.toJSON();
+            jsonData.points.unshift(jsonData.columns);
+            let fn = `khronos_export_${jsonData.points[2][0]}_${jsonData.points[jsonData.points.length-1][0]}.csv`
+            let f = new File([csvFormat(jsonData.points)], fn, {type: "text/csv"});
+            let a = window.document.createElement('a');
+            a.href = window.URL.createObjectURL(f);
+            a.download = fn;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            resolve(data);
+        });
     }
 
     render() {
@@ -125,7 +128,7 @@ class Chart extends Component {
                         format="%H:%M"
                         onTrackerChanged={this.handleTrackerChanged.bind(this)}
                         timeRange={this.plot_data.timerange() || new TimeRange(0, 0)}>
-                        <ChartRow height="175">
+                        <ChartRow height="200">
                             <YAxis
                                 id="y"
                                 min={this.plot_data.min("altitude")}
@@ -152,7 +155,7 @@ class Chart extends Component {
                                 />
                             </Charts>
                         </ChartRow>
-                        <ChartRow height="175">
+                        <ChartRow height="200">
                             <YAxis
                                 id="y"
                                 min={this.plot_data.min("ground_speed")}
@@ -190,6 +193,9 @@ class Chart extends Component {
                         className={(baselineMin) ? "Small Active" : "Small"} 
                         onClick={this.handleMin.bind(this)}>
                         MIN
+                    </button>
+                    <button onClick={this.handleExport.bind(this)}>
+                        Export CSV
                     </button>
                 </center>
             </div>
