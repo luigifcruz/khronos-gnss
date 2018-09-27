@@ -19,11 +19,14 @@ typedef struct {
     float true_north;
     float ground_speed;
     float altitude;
+    bool force;
 } State;
 
 typedef struct {
     uint16_t led_status;
     uint8_t serial_tx_active;
+    uint8_t gnss_frequency;
+    uint8_t gnss_uart_speed;
 } Settings;
 
 typedef void (*Notifier)(char* key, char* zone, void* value);

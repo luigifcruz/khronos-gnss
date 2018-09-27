@@ -18,7 +18,7 @@ extern "C" {
 #include "wpa2/utils/base64.h"
 };
 
-const static int client_queue_size = 10;
+const static int client_queue_size = 5;
 const static char http_hdr[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-type: application/json\r\nConnection: close\r\n\r\n";
 
 class ApiServer {

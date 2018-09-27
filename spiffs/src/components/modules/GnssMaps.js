@@ -3,7 +3,6 @@ import { compose, withProps } from 'recompose'
 import React, { Component } from 'react'
 
 import {
-  withScriptjs,
   withGoogleMap,
   GoogleMap,
   Marker
@@ -18,7 +17,6 @@ const MapComponent = compose(
         containerElement: <div style={{ height: '100%' }} />,
         mapElement: <div style={{ height: '100%' }} />,
     }),
-    withScriptjs,
     withGoogleMap
 )((props) =>
     <GoogleMap

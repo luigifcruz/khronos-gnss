@@ -19,6 +19,7 @@ class TimeDate extends Component {
 
     componentDidMount() {
         setInterval(() => this.setState({ date: new Date() }), 1000);
+        console.log(this.props.state.latitude, this.props.state.longitude)
     }
 
     render() {
@@ -84,19 +85,66 @@ class TimeDate extends Component {
                     </center>
                 </div>
                 <h3>Solar Time</h3>
-                    <p>Sunrise</p><h4>{this.state.suncalc.sunrise.toString()}</h4><label>When the top edge of the sun crosses the horizon.</label>
-                    <p>Sunrise End</p><h4>{this.state.suncalc.sunriseEnd.toString()}</h4><label>When the entire sun is above the horizon.</label>
-                    <p>Solar Noon</p><h4>{this.state.suncalc.solarNoon.toString()}</h4><label>When the sun reaches the higher elevation of the day.</label>
-                    <p>Golden Hour End</p><h4>{this.state.suncalc.goldenHour.toString()}</h4><label>When the best time for photography ends.</label>
-                    <p>Sunset Start</p><h4>{this.state.suncalc.sunsetStart.toString()}</h4><label>When the sun touches the horizon.</label>
-                    <p>Sunset</p><h4>{this.state.suncalc.sunset.toString()}</h4><label>When the sun disappears below the horizon. Civil twilight starts.</label>
-                    <p>Dusk</p><h4>{this.state.suncalc.dusk.toString()}</h4><label>When the nautical twilight starts.</label>
-                    <p>Nautical Dusk</p><h4>{this.state.suncalc.nauticalDusk.toString()}</h4><label>When the evening astronomical twilight starts.</label>
-                    <p>Night Start</p><h4>{this.state.suncalc.night.toString()}</h4><label>When it's dark enough for astronomical observations.</label>
-                    <p>Nadir</p><h4>{this.state.suncalc.nadir.toString()}</h4><label>When the sun reaches the lowest position. Darkest time of the night!</label>
-                    <p>Night End</p><h4>{this.state.suncalc.nightEnd.toString()}</h4><label>When the morning astronomical twilight starts.</label>
-                    <p>Nautical Dawn</p><h4>{this.state.suncalc.nauticalDawn.toString()}</h4><label>When the morning nautical twilight starts.</label>
-                    <p>Dawn</p><h4>{this.state.suncalc.dawn.toString()}</h4><label>When the morning twilight ends and morning civil twilight starts.</label>
+                    <div className="PredictionBox">
+                        <p>Sunrise</p>
+                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.sunrise}/></h4>
+                        <label>When the top edge of the sun crosses the horizon.</label>
+                    </div>
+                    <div className="PredictionBox">
+                        <p>Sunrise End</p>
+                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.sunriseEnd}/></h4>
+                        <label>When the entire sun is above the horizon.</label>
+                    </div>
+                    <div className="PredictionBox">
+                        <p>Solar Noon</p>
+                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.solarNoon}/></h4>
+                        <label>When the sun reaches the higher elevation of the day.</label>
+                    </div>
+                    <div className="PredictionBox">
+                        <p>Golden Hour End</p>
+                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.goldenHour}/></h4>
+                        <label>When the best time for photography ends.</label>
+                    </div>
+                    <div className="PredictionBox">
+                        <p>Sunset Start</p>
+                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.sunsetStart}/></h4>
+                        <label>When the sun touches the horizon.</label>
+                    </div>
+                    <div className="PredictionBox">
+                        <p>Sunset</p>
+                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.sunset}/></h4>
+                        <label>When the sun disappears below the horizon.</label>
+                    </div>
+                    <div className="PredictionBox">
+                        <p>Dusk</p>
+                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.dusk}/></h4>
+                        <label>When the nautical twilight starts.</label>
+                    </div>
+                    <div className="PredictionBox">
+                        <p>Nautical Dusk</p>
+                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.nauticalDusk}/></h4>
+                        <label>When the evening astronomical twilight starts.</label>
+                    </div>
+                    <div className="PredictionBox">
+                        <p>Night Start</p>
+                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.night}/></h4>
+                        <label>When it's dark enough for astronomical observations.</label>
+                    </div>
+                    <div className="PredictionBox">
+                        <p>Nadir</p>
+                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.nadir}/></h4>
+                        <label>When the sun reaches the lowest position. Darkest time of the night!</label>
+                    </div>
+                    <div className="PredictionBox">
+                        <p>Night End</p>
+                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.nightEnd}/></h4>
+                        <label>When the morning astronomical twilight starts.</label>
+                    </div>
+                    <div className="PredictionBox">
+                        <p>Dawn</p>
+                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.dawn}/></h4>
+                        <label>When the morning civil twilight starts.</label>
+                    </div>
                 <h3>Lunar Time</h3>
             </div>
         )

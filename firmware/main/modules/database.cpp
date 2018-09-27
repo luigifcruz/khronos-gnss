@@ -85,6 +85,10 @@ void Database::UpdateState(State data) {
         updates.append("altitude ");
     }
 
+    if (data.force) {
+        updates.append("forcing ");
+    }
+
     if (updates.length() > 0) {
         this->snf((char*)updates.c_str(), (char*)"state", this);
     }
@@ -119,6 +123,7 @@ void Database::LoadState() {
     s.true_north = 0.00;
     s.ground_speed = 0.00;
     s.altitude = 0.00;
+    s.force = false;
 
     this->UpdateState(s);
     this->StateLoaded = true;

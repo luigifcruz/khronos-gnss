@@ -7,7 +7,7 @@ class Dashboard extends Component {
     render() {
         return (
             <div className="Dashboard">
-                <p>Welcome to Khronos!</p>
+                <h2>Welcome to Khronos!</h2>
                 <Link to="/gnss">Navigation</Link>
                 <Link to="/tuner">Tuner</Link>
                 <Link to="/clock">Time & Date</Link>

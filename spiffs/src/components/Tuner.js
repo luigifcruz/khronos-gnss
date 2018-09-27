@@ -5,7 +5,9 @@ class Tuner extends Component {
 
     render() {
         return (
-            <p>Tuner</p>
+            <div className="Tuner">
+                <h2>Frequency Tuner</h2>
+            </div>
         )
     }
 

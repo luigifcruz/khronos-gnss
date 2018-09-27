@@ -15,7 +15,7 @@
 class HttpServer {
     private:
     httpd_handle_t server = NULL;
-
+    
     public:
     HttpServer();
     void Stop();

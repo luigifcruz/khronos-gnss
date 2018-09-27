@@ -35,15 +35,12 @@ class App extends Component {
         let payload = JSON.parse(data);
         if (payload.type == "broadcast") {
             this.parseStream(payload)
-        }
-
-        if (payload.type == "heartbeat") {
-            this.updateState()
+            this.updateState(payload.timestamp)
         }
     }
 
-    updateState() {
-        this.props.dispatch(rxa.updateHistory(new TimeEvent(new Date(), this.props.state)));
+    updateState(timestamp) {
+        this.props.dispatch(rxa.updateHistory(new TimeEvent(new Date(Number(timestamp)/1000), this.props.state)));
 
         let { latitude, longitude } = this.props.state;
         this.props.dispatch(rxa.updateMapdata({
@@ -54,16 +51,6 @@ class App extends Component {
 
     handleEvent(data) {
         console.log("[STREAM] Connected to Khronos via WebSocket.");
-    }
-
-    componentDidMount() {
-        this.timer = setInterval(() => { 
-            this.updateState()
-        }, 1000)
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.timer);
     }
 
     render() {

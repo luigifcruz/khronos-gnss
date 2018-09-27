@@ -30,8 +30,9 @@ class GpsHandler {
     Database* db;
 
     static void GpsChannel(void* pvParameters);
-    static void ParseNMEA(char* line, void* pvParameters, time_t* then);
+    static void ParseNMEA(std::string lines, void* pvParameters, time_t* then);
     static void ProgramUBX();
+    static void sendUBXCommand(char *command, int size);
 
     public:
     GpsHandler(Database* db);
