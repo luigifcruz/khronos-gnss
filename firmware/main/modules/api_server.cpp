@@ -5,6 +5,7 @@ static QueueHandle_t client_queue;
 void ApiServer::BroadcastSerial(char* res) {
     unsigned char* msg = base64_encode((const unsigned char*)res, strlen(res), NULL);
     printf("[PAYLOAD=%s]\n", msg);
+    free(msg);
 }
 
 void ApiServer::DeltaResponder(char* key, char* zone, void* value) {
@@ -134,6 +135,10 @@ void ApiServer::ServerHandleQueue(void* pvParameters) {
     vTaskDelete(NULL);
 }
 
+void ApiServer::SerialResponder(void* pvParameters) {
+    // Find the fucking function that get string from terminal.
+}
+
 ApiServer::ApiServer(Database* db) {
     ESP_LOGI(CONFIG_SN, "[API] Service Stated...");
 
@@ -143,4 +148,5 @@ ApiServer::ApiServer(Database* db) {
     ws_server_start(db);
     xTaskCreatePinnedToCore(ApiServer::ServerHandleTask, "ServerHandleTask", 3000, db, 9, NULL, 0);
     xTaskCreatePinnedToCore(ApiServer::ServerHandleQueue, "ServerHandleQueue", 4000, db, 6, NULL, 0);
+    //xTaskCreatePinnedToCore(ApiServer::SerialResponder, "SerialResponder", 4000, db, 6, NULL, 0);
 }

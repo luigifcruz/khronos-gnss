@@ -69,6 +69,15 @@ char* ApiHandler::Response(char* key, char* zone, Database* db) {
         if (strstr(key, "altitude ") || (key && !key[0])) {
             ApiHandler::AddKey((char*)"altitude", (char*)"state", (char*)std::to_string(db->GetState().altitude).c_str(), changes);
         }
+        if (strstr(key, "gnss_sat_info ") || (key && !key[0])) {
+            cJSON *key_changes = cJSON_CreateObject();
+
+            cJSON_AddStringToObject(key_changes, "key", (char*)"gnss_sat_info");
+            cJSON_AddStringToObject(key_changes, "zone", (char*)"state");
+            cJSON_AddItemToObject(key_changes, "value", cJSON_Parse(db->GetState().gnss_sat_info));
+
+            cJSON_AddItemToArray(changes, key_changes);
+        }
     }
     
     char* payload = cJSON_Print(res);

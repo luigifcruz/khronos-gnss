@@ -19,6 +19,9 @@ typedef struct {
     float true_north;
     float ground_speed;
     float altitude;
+    char* gnss_sat_info;
+    // Housekeeping Variables
+    bool upd_sat_info;
     bool force;
 } State;
 

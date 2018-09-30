@@ -11,8 +11,8 @@
 #include "soc/rtc_periph.h"
 #include "driver/gpio.h"
 #include "driver/rtc_io.h"
-#include "esp32/ulp.h"
-#include "ulp_main.h"
+//#include "esp32/ulp.h"
+//#include "ulp_main.h"
 
 #include "lwip/api.h"
 #include "lwip/sys.h"

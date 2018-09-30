@@ -7,6 +7,7 @@
 #include "esp_system.h"
 #include "esp_log.h"
 
+#include <string.h>
 #include <netdb.h>
 #include <time.h>
 #include <sys/time.h>

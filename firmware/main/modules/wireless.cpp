@@ -1,5 +1,6 @@
 #include "wireless.h"
 
+int count = 0;
 static EventGroupHandle_t wifi_event_group = NULL;
 const int IP4_CONNECTED_BIT = BIT0;
 const int IP6_CONNECTED_BIT = BIT1;
@@ -12,6 +13,7 @@ esp_err_t Wireless::EventHandler(void *ctx, system_event_t *event) {
         break;
     case SYSTEM_EVENT_STA_CONNECTED:
         tcpip_adapter_create_ip6_linklocal(TCPIP_ADAPTER_IF_STA);
+        count = 0;
         break;
     case SYSTEM_EVENT_AP_STA_GOT_IP6:
         ESP_LOGI(CONFIG_SN, "[WIRELESS] Got IPv6: %s", ip6addr_ntoa(&event->event_info.got_ip6.ip6_info.ip));
@@ -22,8 +24,10 @@ esp_err_t Wireless::EventHandler(void *ctx, system_event_t *event) {
         xEventGroupSetBits(wifi_event_group, IP4_CONNECTED_BIT);
         break;
     case SYSTEM_EVENT_STA_DISCONNECTED:
-        ESP_LOGI(CONFIG_SN, "[WIRELESS] Disconnected. Trying to reconnect...");
-        esp_wifi_connect();
+        if (count++ < 10) {
+            ESP_LOGI(CONFIG_SN, "[WIRELESS] Disconnected. Trying to reconnect (%d/10)...", count+1);
+            esp_wifi_connect();
+        }
         xEventGroupClearBits(wifi_event_group, IP4_CONNECTED_BIT | IP6_CONNECTED_BIT);
         break;
     default:

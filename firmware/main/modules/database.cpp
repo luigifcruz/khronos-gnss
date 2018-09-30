@@ -85,6 +85,12 @@ void Database::UpdateState(State data) {
         updates.append("altitude ");
     }
 
+    this->state.gnss_sat_info = data.gnss_sat_info;
+    if (data.upd_sat_info) {
+        updates.append("gnss_sat_info ");
+        data.upd_sat_info = false;
+    }
+
     if (data.force) {
         updates.append("forcing ");
     }
@@ -123,6 +129,8 @@ void Database::LoadState() {
     s.true_north = 0.00;
     s.ground_speed = 0.00;
     s.altitude = 0.00;
+    // Housekeeping Variables
+    s.upd_sat_info = false;
     s.force = false;
 
     this->UpdateState(s);

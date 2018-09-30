@@ -30,6 +30,7 @@ class ApiServer {
     static void HttpServe(struct netconn *conn, void* that);
     static void WebSocketCallback(uint8_t num, WEBSOCKET_TYPE_t type, char* msg, uint64_t len, void* parameter);
     static void BroadcastSerial(char* res);
+    static void SerialResponder(void* pvParameters);
     
     public:
     ApiServer(Database* db);

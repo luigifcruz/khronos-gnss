@@ -12,6 +12,7 @@
 #include "esp_log.h"
 #include "driver/uart.h"
 #include "database.h"
+#include "cJSON.h"
 
 extern "C" {
 #include "minmea/minmea.h"
@@ -22,6 +23,7 @@ extern "C" {
 #define ECHO_TEST_RTS  (UART_PIN_NO_CHANGE)
 #define ECHO_TEST_CTS  (UART_PIN_NO_CHANGE)
 
+#define NMEA_RATE 10
 #define NMEA_BUF_SIZE 1024
 #define INDENT_SPACES "  "
 
@@ -30,7 +32,7 @@ class GpsHandler {
     Database* db;
 
     static void GpsChannel(void* pvParameters);
-    static void ParseNMEA(std::string lines, void* pvParameters, time_t* then);
+    static void ParseNMEA(std::string lines, void* pvParameters);
     static void ProgramUBX();
     static void sendUBXCommand(char *command, int size);
 

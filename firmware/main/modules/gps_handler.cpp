@@ -1,6 +1,11 @@
 #include "gps_handler.h"
 
 static SemaphoreHandle_t x_ubx_command_semaphore;
+uint64_t cycle = 0;
+
+bool decimator(int cycles) {
+    return ((cycle % (cycles*NMEA_RATE)) == 0);
+}
 
 char *readLine(uart_port_t uart) {
     static char line[256];
@@ -19,14 +24,23 @@ char *readLine(uart_port_t uart) {
     }
 }
 
-void GpsHandler::ParseNMEA(std::string lines, void* pvParameters, time_t* then) {
+void GpsHandler::ParseNMEA(std::string lines, void* pvParameters) {
     static Database *db = (Database*)pvParameters;
     State s = db->GetState();
+
+    cJSON *info, *gps, *glonass, *galileo, *list;
+    info = cJSON_CreateObject();
+    gps = cJSON_CreateArray();
+    glonass = cJSON_CreateArray();
+    galileo = cJSON_CreateArray();
+
+    cJSON_AddItemToObject(info, "gps", gps);
+    cJSON_AddItemToObject(info, "glonass", glonass);
+    cJSON_AddItemToObject(info, "galileo", galileo);
 
     char* line;
     line = strtok((char*)lines.c_str(), "\n");
     while (line != NULL) {
-        
         switch (minmea_sentence_id(line, false)) {
             case MINMEA_SENTENCE_GGA: {
                 struct minmea_sentence_gga frame;
@@ -56,12 +70,27 @@ void GpsHandler::ParseNMEA(std::string lines, void* pvParameters, time_t* then) 
             case MINMEA_SENTENCE_GSV: {
                 struct minmea_sentence_gsv frame;
                 if (minmea_parse_gsv(&frame, line)) {
-                    if (strstr(line, "GLGSV")) {
-                        s.sat_count_glonass = frame.total_sats;
-                    }
+                    for (int i = 0; i < 4; i++) {
 
-                    if (strstr(line, "GPGSV")) {
-                        s.sat_count_gps = frame.total_sats;
+                        if (frame.sats[i].nr == 0) 
+                            continue;
+
+                        list = cJSON_CreateObject();
+
+                        if (strstr(line, "GLGSV")) {
+                            s.sat_count_glonass = frame.total_sats;
+                            cJSON_AddItemToArray(glonass, list);
+                        }
+
+                        if (strstr(line, "GPGSV")) {
+                            s.sat_count_gps = frame.total_sats;
+                            cJSON_AddItemToArray(gps, list);
+                        }
+
+                        cJSON_AddItemToObject(list, "n", cJSON_CreateNumber(frame.sats[i].nr));
+                        cJSON_AddItemToObject(list, "e", cJSON_CreateNumber(frame.sats[i].elevation));
+                        cJSON_AddItemToObject(list, "a", cJSON_CreateNumber(frame.sats[i].azimuth));
+                        cJSON_AddItemToObject(list, "s", cJSON_CreateNumber(frame.sats[i].snr));
                     }
                 }
             } break;
@@ -70,8 +99,8 @@ void GpsHandler::ParseNMEA(std::string lines, void* pvParameters, time_t* then) 
                 struct minmea_sentence_zda frame;
                 if (minmea_parse_zda(&frame, line)) {
                     time_t now;
-                    struct tm tm;
                     time(&now);
+                    struct tm tm;
                     localtime_r(&now, &tm);
                     tm.tm_year = frame.date.year - 1900;
                     tm.tm_mon = frame.date.month - 1;
@@ -80,11 +109,9 @@ void GpsHandler::ParseNMEA(std::string lines, void* pvParameters, time_t* then) 
                     tm.tm_min = frame.time.minutes - frame.minute_offset;
                     tm.tm_sec = frame.time.seconds;
 
-                    if ((now-*then) >= 60 || now < 100) {
+                    if (decimator(60)) {
                         const struct timeval tv = {mktime(&tm), 0};
                         settimeofday(&tv, 0);
-                        *then = now;
-
                         char strftime_buf[64];
                         strftime(strftime_buf, sizeof(strftime_buf), "%FT%TZ", &tm);
                         ESP_LOGI(CONFIG_SN, "[GPS] Time updated to %s", strftime_buf);
@@ -101,8 +128,16 @@ void GpsHandler::ParseNMEA(std::string lines, void* pvParameters, time_t* then) 
         line = strtok(NULL, "\n");
     }
 
+    if (decimator(1)) {
+        s.upd_sat_info = true;
+        free(s.gnss_sat_info);
+        s.gnss_sat_info = cJSON_Print(info);
+    }
+    cJSON_Delete(info);
+
     s.force = true;
     db->UpdateState(s);
+    cycle++;
 }
 
 void GpsHandler::sendUBXCommand(char *command, int size) {
@@ -127,7 +162,7 @@ void GpsHandler::ProgramUBX() {
     uart_set_baudrate(UART_NUM_2, 115200);
     uart_flush(UART_NUM_2);
 
-    //sendUBXCommand((char*)&ubx_10hz_update, sizeof(ubx_10hz_update));
+    sendUBXCommand((char*)&ubx_10hz_update, sizeof(ubx_10hz_update));
 
     ESP_LOGI(CONFIG_SN, "[GPS] UBX module programmed.");
     vTaskDelay(100);
@@ -136,7 +171,6 @@ void GpsHandler::ProgramUBX() {
 void GpsHandler::GpsChannel(void* pvParameters) {
     uart_config_t uart_config;
     std::string lines;
-    time_t then = 0;
     
     uart_config.baud_rate = 9600;
     uart_config.data_bits = UART_DATA_8_BITS;
@@ -156,7 +190,7 @@ void GpsHandler::GpsChannel(void* pvParameters) {
         lines.append(line);
 
         if (strstr(line, "ZDA")) {
-            GpsHandler::ParseNMEA(lines, pvParameters, &then);
+            GpsHandler::ParseNMEA(lines, pvParameters);
             lines.clear();
         }
     }
