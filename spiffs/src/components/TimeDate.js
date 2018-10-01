@@ -3,10 +3,24 @@ import { Clock as Analog } from 'react-clock'
 import React, { Component } from 'react'
 import * as rxa from '../redux/actions'
 import { connect } from 'react-redux'
-import Clock from 'react-live-clock'
-import moment from 'moment-timezone'
+import { DateTime } from 'luxon'
 import SunCalc from 'suncalc'
 import '../styles/TimeDate.scss'
+
+function getHour(date, timezone) {
+    if (date.getTime() < 2000) {
+        return "--:--:--";
+    }
+    return DateTime.fromJSDate(date).setZone(timezone).toFormat("HH:mm:ss");
+}
+
+function getDate(date, timezone) {
+    return DateTime.fromJSDate(date).setZone(timezone).toFormat("DDDD");
+}
+
+function getISO(date, timezone) {
+    return DateTime.fromJSDate(date).setZone(timezone).toISO();
+}
 
 class TimeDate extends Component {
 
@@ -16,7 +30,17 @@ class TimeDate extends Component {
             lat: 0.0,
             lon: 0.0,
             date: new Date(),
-            suncalc: SunCalc.getTimes(0, 0, 0)
+            suncalc: SunCalc.getTimes(0, 0, 0),
+            clocks: [{
+                timezone: "local",
+                name: "Local Time"
+            },{
+                timezone: "utc",
+                name: "Universal Time"
+            },{
+                timezone: "America/New_York",
+                name: "New York Time"
+            }]
         }
     }
 
@@ -48,121 +72,89 @@ class TimeDate extends Component {
                 <h2>Time & Date</h2>
                 <div className="ClockSection">
                     <center>
-                        <div className="ClockBlock">
-                            <h3>Local Time</h3>
-                            <Analog
-                                size={250}
-                                secondHandWidth={7}
-                                secondHandLength={80}
-                                minuteHandWidth={10}
-                                minuteMarksWidth={2}
-                                hourMarksWidth={4}
-                                hourHandWidth={10}
-                                value={this.state.date} />
-                            <CopyToClipboard text={this.state.date}>
-                                <div className="DigitalBlock">
-                                    <h4><Clock format={'HH:mm:ss'} ticking={true} /></h4>
-                                    <h5><Clock format={'dddd, MMMM Do, YYYY'} /></h5>
+                        {this.state.clocks.map(function(clock){
+                            return (
+                                <div className="ClockBlock">
+                                    <h3>{clock.name}</h3>
+                                    <Analog
+                                        size={250}
+                                        secondHandWidth={7}
+                                        secondHandLength={80}
+                                        minuteHandWidth={10}
+                                        minuteMarksWidth={2}
+                                        hourMarksWidth={4}
+                                        hourHandWidth={10}
+                                        value={getHour(this.state.date, clock.timezone)} />
+                                    <CopyToClipboard text={getISO(this.state.date, clock.timezone)}>
+                                        <div className="DigitalBlock">
+                                            <h4>{getHour(this.state.date, clock.timezone)}</h4>
+                                            <h5>{getDate(this.state.date, clock.timezone)}</h5>
+                                        </div>
+                                    </CopyToClipboard>
                                 </div>
-                            </CopyToClipboard>
-                        </div>
-                        <div className="ClockBlock">
-                            <h3>Zulu Time</h3>
-                            <Analog
-                                size={250}
-                                secondHandWidth={7}
-                                secondHandLength={80}
-                                minuteHandWidth={10}
-                                minuteMarksWidth={2}
-                                hourMarksWidth={4}
-                                hourHandWidth={10}
-                                value={this.state.date} />
-                            <CopyToClipboard text={this.state.date}>
-                                <div className="DigitalBlock">
-                                    <h4><Clock format={'HH:mm:ss'} ticking={true} timezone={'GMT'} /></h4>
-                                    <h5><Clock format={'dddd, MMMM Do, YYYY'} timezone={'GMT'} /></h5>
-                                </div>
-                            </CopyToClipboard>
-                        </div>
-                        <div className="ClockBlock">
-                            <h3>EST Time</h3>
-                            <Analog
-                                size={250}
-                                secondHandWidth={7}
-                                secondHandLength={80}
-                                minuteHandWidth={10}
-                                minuteMarksWidth={2}
-                                hourMarksWidth={4}
-                                hourHandWidth={10}
-                                value={this.state.date} />
-                            <CopyToClipboard text={this.state.date}>
-                                <div className="DigitalBlock">
-                                    <h4><Clock format={'HH:mm:ss'} ticking={true} timezone={'US/Eastern'} /></h4>
-                                    <h5><Clock format={'dddd, MMMM Do, YYYY'} timezone={'US/Eastern'} /></h5>
-                                </div>
-                            </CopyToClipboard>
-                        </div>
+                            )
+                        }, this)}
                     </center>
                 </div>
                 <h3>Solar Time</h3>
                     <div className="PredictionBox">
                         <p>Sunrise</p>
-                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.sunrise}/></h4>
+                        <h4>{getHour(this.state.suncalc.sunrise, "local")}</h4>
                         <label>When the top edge of the sun crosses the horizon.</label>
                     </div>
                     <div className="PredictionBox">
                         <p>Sunrise End</p>
-                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.sunriseEnd}/></h4>
+                        <h4>{getHour(this.state.suncalc.sunriseEnd, "local")}</h4>
                         <label>When the entire sun is above the horizon.</label>
                     </div>
                     <div className="PredictionBox">
                         <p>Solar Noon</p>
-                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.solarNoon}/></h4>
+                        <h4>{getHour(this.state.suncalc.solarNoon, "local")}</h4>
                         <label>When the sun reaches the higher elevation of the day.</label>
                     </div>
                     <div className="PredictionBox">
                         <p>Golden Hour End</p>
-                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.goldenHour}/></h4>
+                        <h4>{getHour(this.state.suncalc.goldenHour, "local")}</h4>
                         <label>When the best time for photography ends.</label>
                     </div>
                     <div className="PredictionBox">
                         <p>Sunset Start</p>
-                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.sunsetStart}/></h4>
+                        <h4>{getHour(this.state.suncalc.sunsetStart, "local")}</h4>
                         <label>When the sun touches the horizon.</label>
                     </div>
                     <div className="PredictionBox">
                         <p>Sunset</p>
-                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.sunset}/></h4>
+                        <h4>{getHour(this.state.suncalc.sunset, "local")}</h4>
                         <label>When the sun disappears below the horizon.</label>
                     </div>
                     <div className="PredictionBox">
                         <p>Dusk</p>
-                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.dusk}/></h4>
+                        <h4>{getHour(this.state.suncalc.dusk, "local")}</h4>
                         <label>When the nautical twilight starts.</label>
                     </div>
                     <div className="PredictionBox">
                         <p>Nautical Dusk</p>
-                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.nauticalDusk}/></h4>
+                        <h4>{getHour(this.state.suncalc.nauticalDusk, "local")}</h4>
                         <label>When the evening astronomical twilight starts.</label>
                     </div>
                     <div className="PredictionBox">
                         <p>Night Start</p>
-                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.night}/></h4>
+                        <h4>{getHour(this.state.suncalc.night, "local")}</h4>
                         <label>When it's dark enough for astronomical observations.</label>
                     </div>
                     <div className="PredictionBox">
                         <p>Nadir</p>
-                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.nadir}/></h4>
+                        <h4>{getHour(this.state.suncalc.nadir, "local")}</h4>
                         <label>When the sun reaches the lowest position. Darkest time of the night!</label>
                     </div>
                     <div className="PredictionBox">
                         <p>Night End</p>
-                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.nightEnd}/></h4>
+                        <h4>{getHour(this.state.suncalc.nightEnd, "local")}</h4>
                         <label>When the morning astronomical twilight starts.</label>
                     </div>
                     <div className="PredictionBox">
                         <p>Dawn</p>
-                        <h4><Clock format={'HH:mm:ss'} date={this.state.suncalc.dawn}/></h4>
+                        <h4>{getHour(this.state.suncalc.dawn, "local")}</h4>
                         <label>When the morning civil twilight starts.</label>
                     </div>
                 <h3>Lunar Time</h3>
