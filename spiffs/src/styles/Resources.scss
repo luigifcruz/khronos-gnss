@@ -8,11 +8,11 @@ $light-filler: #F1F1F1;
 $background-color: #FEFFFE;
 
 .NoHover {
-	pointer-events: none;
+    pointer-events: none;
 }
 
 .Unbuttonfy {
-	outline: none;
+    outline: none;
     -webkit-appearance: none;
     -moz-appearance: none;
 }
@@ -21,3 +21,9 @@ $background-color: #FEFFFE;
   border: 0;
 }
 
+@mixin centerer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

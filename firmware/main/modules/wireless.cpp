@@ -25,7 +25,7 @@ esp_err_t Wireless::EventHandler(void *ctx, system_event_t *event) {
         break;
     case SYSTEM_EVENT_STA_DISCONNECTED:
         if (count++ < 10) {
-            ESP_LOGI(CONFIG_SN, "[WIRELESS] Disconnected. Trying to reconnect (%d/10)...", count+1);
+            ESP_LOGI(CONFIG_SN, "[WIRELESS] Disconnected. Trying to reconnect (%d/10)...", count);
             esp_wifi_connect();
         }
         xEventGroupClearBits(wifi_event_group, IP4_CONNECTED_BIT | IP6_CONNECTED_BIT);

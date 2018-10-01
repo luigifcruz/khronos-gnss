@@ -24,7 +24,8 @@ export default function reducer(state, action) {
                 latitude: trigger("latitude", state.state.latitude, action),
                 true_north: trigger("true_north", state.state.true_north, action),
                 ground_speed: trigger("ground_speed", state.state.ground_speed, action),
-                altitude: trigger("altitude", state.state.altitude, action)
+                altitude: trigger("altitude", state.state.altitude, action),
+                gnss_sat_info: (action.key == "gnss_sat_info") ? action.value : state.state.gnss_sat_info
             })
         });
 

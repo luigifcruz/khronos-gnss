@@ -11,15 +11,7 @@ import '../styles/App.scss'
 
 class App extends Component {
 
-    parseStream(payload) {
-        if (payload.method == "bulk_update") {
-            console.log("[STREAM] New bulk broadcast received.");
-        }
-
-        if (payload.method == "delta_update") {
-            console.log("[STREAM] New delta broadcast received.");
-        }
-        
+    parseStream(payload) {        
         payload.changes.forEach((value) => {
             if (value.zone == "state") {
                 this.props.dispatch(rxa.updateState(value.key, value.value));
@@ -56,7 +48,7 @@ class App extends Component {
     render() {
         return (
             <div className="App">
-            	<Websocket url='ws://khronos.local:8080/api/stream' onOpen={this.handleEvent.bind(this)} onMessage={this.handleData.bind(this)}/>
+            	<Websocket url='ws://localhost:8080/api/stream' onOpen={this.handleEvent.bind(this)} onMessage={this.handleData.bind(this)}/>
                 <Link to="/" className="Khronos">Khronos</Link>
                 {this.props.children}
             </div>

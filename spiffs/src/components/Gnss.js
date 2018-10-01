@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import Variables from './modules/GnssVariables'
 import Maps from './modules/GnssMaps'
 import Chart from './modules/GnssChart'
+import Orbits from './modules/GnssOrbits'
 
 import '../styles/Gnss.scss'
 
@@ -17,6 +18,7 @@ class Gnss extends Component {
                 <Maps state={this.props.state} mapdata={this.props.mapdata} />
                 <Variables state={this.props.state} />
                 <Chart history={this.props.history} />
+                <Orbits state={this.props.state} />
             </div>
         )
     }

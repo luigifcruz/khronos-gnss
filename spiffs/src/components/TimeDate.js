@@ -4,6 +4,7 @@ import React, { Component } from 'react'
 import * as rxa from '../redux/actions'
 import { connect } from 'react-redux'
 import Clock from 'react-live-clock'
+import moment from 'moment-timezone'
 import SunCalc from 'suncalc'
 import '../styles/TimeDate.scss'
 
@@ -12,14 +13,33 @@ class TimeDate extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            lat: 0.0,
+            lon: 0.0,
             date: new Date(),
-            suncalc: SunCalc.getTimes(new Date(), props.state.latitude, props.state.longitude)
+            suncalc: SunCalc.getTimes(0, 0, 0)
+        }
+    }
+
+    componentWillReceiveProps(newProps) {
+        if (Math.abs(newProps.state.longitude - this.state.lon) > 0.0001 ||
+            Math.abs(newProps.state.latitude - this.state.lat) > 0.0001) {
+            this.setState({
+                lat: this.props.state.latitude,
+                lon: this.props.state.longitude, 
+                suncalc: SunCalc.getTimes(
+                    new Date(),
+                    this.props.state.latitude,
+                    this.props.state.longitude)
+            });
         }
     }
 
     componentDidMount() {
-        setInterval(() => this.setState({ date: new Date() }), 1000);
-        console.log(this.props.state.latitude, this.props.state.longitude)
+        this.interval = setInterval(() => this.setState({ date: new Date() }), 1000);   
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.interval);
     }
 
     render() {
@@ -38,8 +58,8 @@ class TimeDate extends Component {
                                 minuteMarksWidth={2}
                                 hourMarksWidth={4}
                                 hourHandWidth={10}
-                                value={new Date()} />
-                            <CopyToClipboard text={new Date()}>
+                                value={this.state.date} />
+                            <CopyToClipboard text={this.state.date}>
                                 <div className="DigitalBlock">
                                     <h4><Clock format={'HH:mm:ss'} ticking={true} /></h4>
                                     <h5><Clock format={'dddd, MMMM Do, YYYY'} /></h5>
@@ -57,7 +77,7 @@ class TimeDate extends Component {
                                 hourMarksWidth={4}
                                 hourHandWidth={10}
                                 value={this.state.date} />
-                            <CopyToClipboard text={new Date()}>
+                            <CopyToClipboard text={this.state.date}>
                                 <div className="DigitalBlock">
                                     <h4><Clock format={'HH:mm:ss'} ticking={true} timezone={'GMT'} /></h4>
                                     <h5><Clock format={'dddd, MMMM Do, YYYY'} timezone={'GMT'} /></h5>
@@ -75,7 +95,7 @@ class TimeDate extends Component {
                                 hourMarksWidth={4}
                                 hourHandWidth={10}
                                 value={this.state.date} />
-                            <CopyToClipboard text={new Date()}>
+                            <CopyToClipboard text={this.state.date}>
                                 <div className="DigitalBlock">
                                     <h4><Clock format={'HH:mm:ss'} ticking={true} timezone={'US/Eastern'} /></h4>
                                     <h5><Clock format={'dddd, MMMM Do, YYYY'} timezone={'US/Eastern'} /></h5>
