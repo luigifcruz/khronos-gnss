@@ -18,11 +18,6 @@ extern "C" {
 #include "minmea/minmea.h"
 }
 
-#define ECHO_TEST_TXD  (GPIO_NUM_17)
-#define ECHO_TEST_RXD  (GPIO_NUM_16)
-#define ECHO_TEST_RTS  (UART_PIN_NO_CHANGE)
-#define ECHO_TEST_CTS  (UART_PIN_NO_CHANGE)
-
 #define NMEA_RATE 10
 #define NMEA_BUF_SIZE 1024
 #define INDENT_SPACES "  "

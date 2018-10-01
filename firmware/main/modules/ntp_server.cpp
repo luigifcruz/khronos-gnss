@@ -4,7 +4,6 @@ extern const uint8_t ulp_main_bin_start[] asm("_binary_ulp_main_bin_start");
 extern const uint8_t ulp_main_bin_end[] asm("_binary_ulp_main_bin_end");
 
 void NtpServer::InitCoprocessor() {
-/*
     esp_err_t err = ulp_load_binary(0, ulp_main_bin_start, (ulp_main_bin_end - ulp_main_bin_start) / sizeof(uint32_t));
     if (err) {
         ESP_LOGE(CONFIG_SN, "[ULP] Failed to load coprocessor firmware.");
@@ -33,7 +32,7 @@ void NtpServer::InitCoprocessor() {
     } else {
         vTaskDelay(100 / portTICK_RATE_MS);
         ESP_LOGI(CONFIG_SN, "[ULP] Coprocessor successfully started! (Heartbeat: %d)", (ulp_checkmark & UINT16_MAX)); 
-    }*/
+    }
 }
 
 void NtpServer::GetTime(tstamp* time) {

@@ -180,7 +180,7 @@ void GpsHandler::GpsChannel(void* pvParameters) {
     uart_config.rx_flow_ctrl_thresh = 120;
 
     uart_param_config(UART_NUM_2, &uart_config);
-    uart_set_pin(UART_NUM_2, ECHO_TEST_TXD, ECHO_TEST_RXD, ECHO_TEST_RTS, ECHO_TEST_CTS);
+    uart_set_pin(UART_NUM_2, GPIO_NUM_17, GPIO_NUM_16, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
     uart_driver_install(UART_NUM_2, NMEA_BUF_SIZE * 2, 0, 0, NULL, 0);
 
     GpsHandler::ProgramUBX();
