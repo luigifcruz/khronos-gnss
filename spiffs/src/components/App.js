@@ -6,10 +6,31 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { TimeEvent } from 'pondjs'
 import request from 'superagent'
+import prefix from 'superagent-prefix'
 
 import '../styles/App.scss'
 
 class App extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            prefix: "khronos.local"
+        }
+    }
+
+    componentDidMount() {
+        request
+            .post('/api/request')
+            .send({method: "get", target: "data"})
+            .use(prefix(`http://${this.state.prefix}:8080`))
+            .end((err, res) => {
+                if (err || JSON.parse(res.text).method !== "bulk_update") {
+                    console.log("[STREAM] Khronos didn't responded. Connecting to localhost...");
+                    this.setState({ prefix: "localhost" });
+                };
+            });
+    }
 
     parseStream(payload) {        
         payload.changes.forEach((value) => {
@@ -48,7 +69,7 @@ class App extends Component {
     render() {
         return (
             <div className="App">
-            	<Websocket url='ws://localhost:8080/api/stream' onOpen={this.handleEvent.bind(this)} onMessage={this.handleData.bind(this)}/>
+            	<Websocket url={`ws://${this.state.prefix}:8080/api/stream`} onOpen={this.handleEvent.bind(this)} onMessage={this.handleData.bind(this)}/>
                 <Link to="/" className="Khronos">Khronos</Link>
                 {this.props.children}
             </div>

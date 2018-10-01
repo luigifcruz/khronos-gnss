@@ -16,7 +16,9 @@
             color: $heavy-text;
             border-spacing: 0.5em;
             display: block;
-            @include centerer;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
 
             tr {
                 text-align: center;

@@ -94,6 +94,11 @@ void ApiServer::HttpServe(struct netconn *conn, void* parameter) {
             netbuf_delete(inbuf);
         } else {
             ESP_LOGW(CONFIG_SN, "[API] Bad request, dropping...");
+
+            const char* alive = "{result: 0}";
+            netconn_write(conn, http_hdr, strlen(http_hdr), NETCONN_NOCOPY);
+            netconn_write(conn, alive, strlen(alive), NETCONN_NOCOPY);
+
             netconn_close(conn);
             netconn_delete(conn);
             netbuf_delete(inbuf);

@@ -4,8 +4,8 @@ import createLogger from 'redux-logger'
 import Ring from "ringjs"
 
 let defaultState = {
-    'history': new Ring(2000),
-    'mapdata': new Ring(500),
+    'history': new Ring(200),
+    'mapdata': new Ring(100),
     'state': {
     	'gnss_fix_quality': 0,
     	'gnss_fix_type': 0,
