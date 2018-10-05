@@ -28,7 +28,7 @@ server = WebsocketServer(8080, host='127.0.0.1')
 command = ""
 
 ser = serial.Serial(
-    port='/dev/tty.SLAB_USBtoUART',
+    port='/dev/ttyUSB0',
     baudrate=921600
 )
 

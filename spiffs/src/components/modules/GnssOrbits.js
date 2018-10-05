@@ -158,29 +158,31 @@ class Orbits extends Component {
     render() {
         return (
             <div className="Orbits">
-                <div className="Drawing" ref={node => this.node = node}></div>
-                <div className="Variables">
-                    <table>
-                        <tr>
-                            <th>PRN</th>
-                            <th>GNSS</th>
-                            <th>Elevation</th> 
-                            <th>Azimuth</th>
-                            <th>SNR</th>
-                        </tr>
-                        {this.state.gnss_position.map(function(sat, i){
-                            return (
-                                <tr>
-                                    <td>{sat[2]}</td>
-                                    <td>{sat[4]}</td>
-                                    <td>{sat[1].pad() + "°"}</td> 
-                                    <td>{sat[0].pad(3) + "°"}</td>
-                                    <td>{sat[3].pad()}</td>
-                                </tr>
-                            )
-                        })}
-                    </table>
-                </div>
+                <center>
+                    <div className="Drawing" ref={node => this.node = node}></div>
+                    <div className="Variables">
+                        <table>
+                            <tr>
+                                <th>PRN</th>
+                                <th>GNSS</th>
+                                <th>Elevation</th> 
+                                <th>Azimuth</th>
+                                <th>SNR</th>
+                            </tr>
+                            {this.state.gnss_position.map(function(sat, i){
+                                return (
+                                    <tr>
+                                        <td>{sat[2]}</td>
+                                        <td>{sat[4]}</td>
+                                        <td>{sat[1].pad() + "°"}</td> 
+                                        <td>{sat[0].pad(3) + "°"}</td>
+                                        <td>{sat[3].pad()}</td>
+                                    </tr>
+                                )
+                            })}
+                        </table>
+                    </div>
+                </center>
             </div>
         )
     }

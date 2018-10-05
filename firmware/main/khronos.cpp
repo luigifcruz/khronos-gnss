@@ -11,6 +11,7 @@
 #include "modules/database.h"
 #include "modules/ntp_server.h"
 #include "modules/gps_handler.h"
+#include "modules/display.h"
 
 static void LedNotifier(char* key, char* zone, void* value) {
     uint16_t* lvl = (uint16_t*)value;
@@ -24,6 +25,8 @@ extern "C" {
 void app_main() {
     static KeyStorage keys;
     static Database db(&keys);
+
+    Display display(&db);
 
     FlashStorage flash;
     MdnsResponder mdns;

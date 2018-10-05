@@ -15,7 +15,9 @@ class Gnss extends Component {
         return (
             <div className="Gnss">
                 <h2>GNSS Navigation</h2>
+                <Maps state={this.props.state} mapdata={this.props.mapdata} />
                 <Variables state={this.props.state} />
+                <Chart history={this.props.history} />
                 <Orbits state={this.props.state} />
             </div>
         )
