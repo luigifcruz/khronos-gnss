@@ -4,7 +4,7 @@
 #include <cstring>
 #include <string>
 #include <sys/param.h>
-#include <http_server.h>
+#include <esp_http_server.h>
 
 #include "flash_storage.h"
 #include "esp_system.h"
@@ -12,11 +12,12 @@
 
 #define BUF_SIZE 1024
 
-class HttpServer {
-    private:
+class HttpServer
+{
+private:
     httpd_handle_t server = NULL;
-    
-    public:
+
+public:
     HttpServer();
     void Stop();
 };

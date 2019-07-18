@@ -1,0 +1,105 @@
+syntax="proto3";
+
+message Location {
+	float latitude = 1;
+	float longitude = 2;
+	uint32 altitude = 3;
+}
+
+message Payload {
+	uint32 chunk = 1;
+	uint32 chunk_num = 2;
+	bytes hash_key = 3;
+	bytes data = 4;
+}
+
+message Request {
+	uint32 chunk = 1;
+	bytes hash_key = 2;
+}
+
+message Pod {
+    string sender = 1;	
+
+	Location source = 2;
+	Location destination = 3;
+
+	fixed32 timestamp = 4;
+	uint32 flight_radius = 5;
+
+    uint32 priority = 6;
+	uint32 hops = 7;
+
+	Payload payload = 8;
+	Request request = 9;	
+}
+
+message Data {
+	repeated Report report = 1;
+	repeated Weather weather = 2;
+	repeated Message message = 3;
+	repeated Audio audio = 4;
+	repeated File file = 5;
+
+	Balloon balloon = 6;
+	Plane plane = 7;
+	Vessel vessel = 8;
+	Vehicle vehicle = 9;
+	Spacecraft spacecraft = 10;
+
+	string author = 11;
+	fixed32 timestamp = 12;
+	Location location = 13;
+}
+
+message Plane {
+	uint32 wind_speed = 1;
+	uint32 ground_speed = 2;
+	string squawk = 3;
+}
+
+message Vessel {
+	string name = 1;
+}
+
+message Vehicle {
+	uint32 speed = 1;
+}
+
+message Balloon {
+	uint32 speed = 1;
+}
+
+message Report {
+	string subject = 1;
+	string body = 2;
+}
+
+message Spacecraft {
+    string name = 1;
+}
+
+message Weather {
+	fixed32 timestamp = 1;
+	float temperature = 2;
+	float humidity = 3;
+	float pressure = 4;
+}
+
+message Message {
+    string receiver = 1;
+	string body = 2;
+	Location location = 3;
+}
+
+message Audio {
+	string receiver = 1;
+	string duration = 2;
+	bytes blob = 3;
+}
+
+message File {
+	string receiver = 1;
+    string name = 2;
+    bytes blob = 3;
+}

@@ -11,8 +11,6 @@
 #include "soc/rtc_periph.h"
 #include "driver/gpio.h"
 #include "driver/rtc_io.h"
-#include "esp32/ulp.h"
-#include "ulp_main.h"
 
 #include "lwip/api.h"
 #include "lwip/sys.h"
@@ -27,13 +25,14 @@
 #define BUFFLEN 512
 #define NTPPORT 123
 
-class NtpServer {
+class NtpServer
+{
 private:
     static void InitCoprocessor();
-    static void UdpHandler(void* pvParameters);
+    static void UdpHandler(void *pvParameters);
 
 public:
-	static void GetTime(tstamp* time);
+    static void GetTime(tstamp *time);
 
     NtpServer();
 };

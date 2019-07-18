@@ -35,5 +35,5 @@ app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, "dist/index.html"));
 })
 
-const server = http.createServer(app).listen(3002);
+const server = http.createServer(app).listen(30022);
 console.log(`Simulator started at port 3002...`);

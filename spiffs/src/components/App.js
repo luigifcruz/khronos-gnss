@@ -70,7 +70,7 @@ class App extends Component {
         return (
             <div className="App">
             	<Websocket url={`ws://${this.state.prefix}:8080/api/stream`} onOpen={this.handleEvent.bind(this)} onMessage={this.handleData.bind(this)}/>
-                <Link to="/" className="Khronos">Khronos</Link>
+                <Link to="/" className="Khronos">Khro9iadsnos</Link>
                 {this.props.children}
             </div>
         )
