@@ -178,7 +178,7 @@ int txPayload(uint8_t* file_name) {
     pod.destination = &loc;
     pod.timestamp = (uint32_t)time(NULL);
     pod.flight_radius = 50;
-    pod.priority = 0;
+    pod.priority = 10;
     pod.hops = 0;
 
     int id = -1;
@@ -206,7 +206,7 @@ int txPayload(uint8_t* file_name) {
         }
         
         pod.payload = &pl;
-        
+
         size_t pod_len = pod__get_packed_size(&pod);
         uint8_t* pod_buf = (uint8_t*)malloc(pod_len);
    
@@ -230,8 +230,48 @@ int txPayload(uint8_t* file_name) {
     return 0;
 }
 
-int rxPayload(char* file_name) {
+int rxPayload(Pod* pod) {
     printf("[RX_PAYLOAD] Parsing payload...\n");
+    return -1;
+}
+
+int rxRequest(Pod* pod) {
+    printf("[RX_REQUEST] Parsing request...\n");
+    return -1;
+}
+
+int validatePayload(Payload* pl) {
+    int err = 0;
+
+    err += (pl->chunk > pl->chunk_num);
+    err += (pl->hash_key.len == 0);
+    err += (pl->data.len == 0);
+
+    return err;
+}
+
+int validateRequest(Request* req) {
+    int err = 0;
+
+    err += (req->hash_key.len == 0);
+
+    return err;
+}
+
+int validatePod(Pod* pod) {
+    int err = 0;
+
+    err += (pod->payload != NULL && pod->request != NULL);
+    err += (pod->payload == NULL && pod->request == NULL);
+    err += (pod->source == NULL || pod->destination == NULL);
+    err += (pod->priority < 0 && pod->priority > 10);
+    err += strlen(pod->sender) == 0;
+    
+    return err;
+}
+
+int receive(char* file_name) {
+    printf("[RX] New message received...\n");
 
     uint8_t payload[MAX_POD_SIZE];
     size_t size = loadFile((uint8_t*)&payload, file_name);
@@ -245,7 +285,30 @@ int rxPayload(char* file_name) {
     if (nullPointer(pod))
 	return 2;
 
-    
+    int err = 0;
+
+    if ((err = validatePod(pod))) {
+        printf("[RX] Invalid packet (%d).\n", err);
+        return 1;
+    };
+
+    if (pod->payload != NULL) {
+        if ((err = validatePayload(pod->payload))) {
+            printf("[RX] Invalid payload (%d).\n", err);
+            return 1;
+        };
+
+        rxPayload(pod);
+    }
+
+    if (pod->request != NULL) {
+        if ((err = validateRequest(pod->request))) {
+            printf("[RX] Invalid request (%d).\n", err);
+            return 1;
+        };
+
+        rxRequest(pod);
+    }
     
     pod__free_unpacked(pod, NULL);
 
@@ -272,10 +335,10 @@ int main() {
     struct dirent *ent;
     while ((ent = readdir(dir)) != NULL) {
         if (strstr(ent->d_name, ".pb")) {
-            char rx_fn[512];
+            char rx_fn[512]; // Temporary fix for the sprintf warning. 
             sprintf(rx_fn, "%s/%s", rx_cache, ent->d_name);
-            printf("%s\n", rx_fn);
-            if (rxPayload(rx_fn)) {
+            
+            if (receive(rx_fn)) {
                 printf("Error: Parsing the received payload.\n");
             }
         }        

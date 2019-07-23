@@ -2,6 +2,7 @@
 .vscode
 sdkconfig
 */build/*
+toolkit/gateway/spiffs/*
 node_modules
 package-lock.json
 npm-debug.log
