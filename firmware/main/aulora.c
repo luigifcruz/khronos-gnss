@@ -1,32 +1,12 @@
-#include <dirent.h>
-#include <inttypes.h>
-#include <mbedtls/md5.h>
-#include <sqlite3.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-
-#include "aulora.pb-c.h"
-
-#define HASH_LENGTH 16
-#define MAX_PAYLOAD_SIZE 256
-#define MAX_HEADER_SIZE 128
-#define MAX_POD_SIZE MAX_PAYLOAD_SIZE + MAX_HEADER_SIZE
-#define SENDER "PU2SPY"
-
-#define PODS                                                                 \
-  "pods (id, sender, src_lat, src_lon, src_alt, dst_lat, dst_lon, dst_alt, " \
-  "timestamp, flight_radius, priority, hops)"
-#define PAYLOADS "payloads(id, payload_pod, chunk, chunk_num, hash_key, data)"
+#include "aulora.h"
 
 int nullPointer(void* ptr) {
   if (ptr == NULL) return 1;
   return 0;
 }
 
-uint8_t* fileHash(char* file_name) {
-  FILE* fp = fopen(file_name, "rb");
+uint8_t* fileHash(uint8_t* file_name) {
+  FILE* fp = fopen((void*)file_name, "rb");
 
   if (nullPointer(fp)) return NULL;
 
@@ -49,9 +29,9 @@ uint8_t* fileHash(char* file_name) {
   return (uint8_t*)&c;
 }
 
-size_t fileSize(char* file_name) {
+size_t fileSize(uint8_t* file_name) {
   size_t size;
-  FILE* fp = fopen(file_name, "rb");
+  FILE* fp = fopen((void*)file_name, "rb");
 
   if (nullPointer(fp)) return -1;
 
@@ -64,8 +44,8 @@ size_t fileSize(char* file_name) {
   return size;
 }
 
-size_t loadFile(uint8_t* buffer, char* file_name) {
-  FILE* fp = fopen(file_name, "rb");
+size_t loadFile(uint8_t* buffer, uint8_t* file_name) {
+  FILE* fp = fopen((void*)file_name, "rb");
 
   if (nullPointer(fp)) return -1;
 
@@ -79,8 +59,9 @@ size_t loadFile(uint8_t* buffer, char* file_name) {
   return size;
 }
 
-size_t fileChunk(uint8_t* buffer, char* file_name, size_t size, size_t chunk) {
-  FILE* fp = fopen(file_name, "rb");
+size_t fileChunk(uint8_t* buffer, uint8_t* file_name, size_t size,
+                 size_t chunk) {
+  FILE* fp = fopen((void*)file_name, "rb");
 
   if (nullPointer(fp)) return -1;
 
@@ -170,7 +151,7 @@ int txPayload(sqlite3* db, uint8_t* file_name) {
   size_t size = fileSize(file_name);
   uint8_t* hash = fileHash(file_name);
 
-  printf("Payload size is %ld.\n", size);
+  printf("Payload size is %d.\n", (int)size);
   printf("Payload MD5 hash is: ");
   for (int i = 0; i < HASH_LENGTH; i++) {
     printf("%02x", hash[i]);
@@ -179,7 +160,7 @@ int txPayload(sqlite3* db, uint8_t* file_name) {
 
   size_t chunk_num = (size + MAX_PAYLOAD_SIZE - 1) / MAX_PAYLOAD_SIZE;
 
-  printf("Splitting payload into %ld chunks of size %d.\n", chunk_num,
+  printf("Splitting payload into %d chunks of size %d.\n", (int)chunk_num,
          MAX_PAYLOAD_SIZE);
   printf("+ Generating Pod.\n");
 
@@ -204,7 +185,7 @@ int txPayload(sqlite3* db, uint8_t* file_name) {
   }
 
   for (int i = 0; i < chunk_num; i++) {
-    printf("  Generating Payload %d/%ld.\n", i + 1, chunk_num);
+    printf("  Generating Payload %d/%d.\n", i + 1, (int)chunk_num);
 
     uint8_t data_buf[MAX_PAYLOAD_SIZE];
     size_t data_len = fileChunk((uint8_t*)&data_buf, file_name, size, i);
@@ -231,8 +212,8 @@ int txPayload(sqlite3* db, uint8_t* file_name) {
     pod__pack(&pod, pod_buf);
 
     uint8_t filename[32];
-    sprintf(filename, "./spiffs/rx_cache/small-%d.pb", i);
-    FILE* fp = fopen(filename, "wb");
+    sprintf((void*)filename, "/spiffs/rx_cache/small-%d.pb", i);
+    FILE* fp = fopen((void*)filename, "wb");
     if (nullPointer(fp)) return 1;
 
     fwrite(pod_buf, pod_len, 1, fp);
@@ -306,7 +287,7 @@ int receive(sqlite3* db, char* file_name) {
   printf("[RX] New message received...\n");
 
   uint8_t payload[MAX_POD_SIZE];
-  size_t size = loadFile((uint8_t*)&payload, file_name);
+  size_t size = loadFile((uint8_t*)&payload, (void*)file_name);
 
   if (size == -1) {
     printf("Error: Opening the payload file.\n");
@@ -372,63 +353,21 @@ int restorePayloads(sqlite3* db) {
       sprintf(str_hash + (i * 2), "%02x", hash[i]);
     }
 
-    printf("Found chunk %d (MD5: %s)\n", chunk, str_hash);
-
     size_t size = sqlite3_column_bytes(stmt, 5);
     uint8_t* payload = sqlite3_column_blob(stmt, 5);
 
-    uint8_t filename[64];
-    sprintf(filename, "./spiffs/payloads/%s.gz", str_hash);
+    char filename[64];
+    sprintf(filename, "/spiffs/%.*s", 24, str_hash);
     FILE* fp = fopen(filename, "ab");
     if (nullPointer(fp)) return 1;
 
     fseek(fp, chunk * MAX_PAYLOAD_SIZE, SEEK_SET);
     fwrite(payload, size, 1, fp);
     fclose(fp);
+
+    printf("Chunk %d (MD5: %s) %s\n", chunk, str_hash, filename);
   }
 
   sqlite3_finalize(stmt);
-  return 0;
-}
-
-int main() {
-  srand(time(NULL));
-
-  sqlite3* db_tx;
-  sqlite3_open("./spiffs/database_tx.db", &db_tx);
-  if (nullPointer(db_tx)) return 2;
-
-  sqlite3* db_rx;
-  sqlite3_open("./spiffs/database_rx.db", &db_rx);
-  if (nullPointer(db_rx)) return 2;
-
-  uint8_t* tx_fn = "./small.txt";
-  if (txPayload(db_tx, tx_fn)) {
-    printf("Error: Transmitting the payload.\n");
-  }
-
-  return 0;
-
-  char* rx_cache = "./spiffs/rx_cache";
-  DIR* dir = opendir(rx_cache);
-  if (nullPointer(dir)) return 2;
-
-  struct dirent* ent;
-  while ((ent = readdir(dir)) != NULL) {
-    if (strstr(ent->d_name, ".pb")) {
-      char rx_fn[512];  // Temporary fix for the sprintf warning.
-      sprintf(rx_fn, "%s/%s", rx_cache, ent->d_name);
-
-      if (receive(db_rx, rx_fn)) {
-        printf("Error: Parsing the received payload.\n");
-      }
-    }
-  }
-  closedir(dir);
-
-  restorePayloads(db_rx);
-
-  sqlite3_close(db_rx);
-  sqlite3_close(db_tx);
   return 0;
 }

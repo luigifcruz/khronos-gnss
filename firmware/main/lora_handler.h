@@ -2,27 +2,28 @@
 #define LORA_HANDLER_H
 #define __STDC_FORMAT_MACROS
 
+#include <ctype.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>
 
-#include "esp_system.h"
-#include "esp_log.h"
-#include "driver/uart.h"
 #include "database.h"
+#include "driver/uart.h"
+#include "esp_log.h"
+#include "esp_system.h"
 
-#include "aulora.pb-c.h"
+extern "C" {
+#include "aulora.h"
+}
 
-class LoraHandler
-{
-private:
-    Database *db;
+class LoraHandler {
+ private:
+  Database *db;
 
-    static void LoraChannel(void *pvParameters);
+  static void LoraChannel(void *pvParameters);
 
-public:
-    LoraHandler(Database *db);
+ public:
+  LoraHandler(Database *db);
 };
 
 #endif

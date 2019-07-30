@@ -1,0 +1,31 @@
+#ifndef AULORA_H
+#define AULORA_H
+
+#include <dirent.h>
+#include <inttypes.h>
+#include <mbedtls/md5.h>
+#include <sqlite3.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#include "aulora.pb-c.h"
+
+#define HASH_LENGTH 16
+#define MAX_PAYLOAD_SIZE 256
+#define MAX_HEADER_SIZE 128
+#define MAX_POD_SIZE MAX_PAYLOAD_SIZE + MAX_HEADER_SIZE
+#define SENDER "PU2SPY"
+
+#define PODS                                                                 \
+  "pods (id, sender, src_lat, src_lon, src_alt, dst_lat, dst_lon, dst_alt, " \
+  "timestamp, flight_radius, priority, hops)"
+#define PAYLOADS "payloads(id, payload_pod, chunk, chunk_num, hash_key, data)"
+
+int nullPointer(void*);
+int txPayload(sqlite3*, uint8_t*);
+int receive(sqlite3*, char*);
+int restorePayloads(sqlite3*);
+
+#endif

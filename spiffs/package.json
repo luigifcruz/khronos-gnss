@@ -6,8 +6,8 @@
   "scripts": {
     "prod": "webpack --config webpack.config.prod.js && node server.prod.js",
     "dev": "webpack --config webpack.config.dev.js && node server.dev.js",
-    "build": "webpack --config webpack.config.prod.js && mkspiffs -c dist/ -b 4096 -p 256 -s 0x200000 spiffs.bin",
-    "flash": "esptool.py --chip esp32 --port /dev/ttyUSB1 --baud 921600 write_flash -z 0x110000 spiffs.bin",
+    "build": "webpack --config webpack.config.prod.js && mkspiffs -c dist/ -b 4096 -p 256 -s 0x100000 spiffs.bin",
+    "flash": "esptool.py --chip esp32 --port /dev/ttyUSB1 --baud 921600 write_flash -z 0x210000 spiffs.bin",
     "deploy": "npm run build && npm run flash"
   },
   "author": "",

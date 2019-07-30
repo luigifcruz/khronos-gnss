@@ -15,21 +15,21 @@ PROTOBUF_C__BEGIN_DECLS
 #endif
 
 
-typedef struct _Main__Location Main__Location;
-typedef struct _Main__Payload Main__Payload;
-typedef struct _Main__Request Main__Request;
-typedef struct _Main__Pod Main__Pod;
-typedef struct _Main__Data Main__Data;
-typedef struct _Main__Plane Main__Plane;
-typedef struct _Main__Vessel Main__Vessel;
-typedef struct _Main__Vehicle Main__Vehicle;
-typedef struct _Main__Balloon Main__Balloon;
-typedef struct _Main__Report Main__Report;
-typedef struct _Main__Spacecraft Main__Spacecraft;
-typedef struct _Main__Weather Main__Weather;
-typedef struct _Main__Message Main__Message;
-typedef struct _Main__Audio Main__Audio;
-typedef struct _Main__File Main__File;
+typedef struct _Location Location;
+typedef struct _Payload Payload;
+typedef struct _Request Request;
+typedef struct _Pod Pod;
+typedef struct _Data Data;
+typedef struct _Plane Plane;
+typedef struct _Vessel Vessel;
+typedef struct _Vehicle Vehicle;
+typedef struct _Balloon Balloon;
+typedef struct _Report Report;
+typedef struct _Spacecraft Spacecraft;
+typedef struct _Weather Weather;
+typedef struct _Message Message;
+typedef struct _Audio Audio;
+typedef struct _File File;
 
 
 /* --- enums --- */
@@ -37,527 +37,530 @@ typedef struct _Main__File Main__File;
 
 /* --- messages --- */
 
-struct  _Main__Location
+struct  _Location
 {
   ProtobufCMessage base;
-  uint32_t latitude;
-  uint32_t longitude;
+  float latitude;
+  float longitude;
   uint32_t altitude;
 };
-#define MAIN__LOCATION__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&main__location__descriptor) \
+#define LOCATION__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&location__descriptor) \
     , 0, 0, 0 }
 
 
-struct  _Main__Payload
+struct  _Payload
 {
   ProtobufCMessage base;
   uint32_t chunk;
-  uint32_t chunks;
-  ProtobufCBinaryData hash;
+  uint32_t chunk_num;
+  ProtobufCBinaryData hash_key;
   ProtobufCBinaryData data;
 };
-#define MAIN__PAYLOAD__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&main__payload__descriptor) \
+#define PAYLOAD__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&payload__descriptor) \
     , 0, 0, {0,NULL}, {0,NULL} }
 
 
-struct  _Main__Request
+struct  _Request
 {
   ProtobufCMessage base;
   uint32_t chunk;
-  ProtobufCBinaryData hash;
+  ProtobufCBinaryData hash_key;
 };
-#define MAIN__REQUEST__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&main__request__descriptor) \
+#define REQUEST__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&request__descriptor) \
     , 0, {0,NULL} }
 
 
-struct  _Main__Pod
+struct  _Pod
 {
   ProtobufCMessage base;
   char *sender;
-  uint64_t timestamp;
-  Main__Location *source;
-  Main__Location *destination;
+  Location *source;
+  Location *destination;
+  uint32_t timestamp;
   uint32_t flight_radius;
   uint32_t priority;
   uint32_t hops;
-  Main__Payload *payload;
-  Main__Request *request;
+  Payload *payload;
+  Request *request;
 };
-#define MAIN__POD__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&main__pod__descriptor) \
-    , (char *)protobuf_c_empty_string, 0, NULL, NULL, 0, 0, 0, NULL, NULL }
+#define POD__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&pod__descriptor) \
+    , (char *)protobuf_c_empty_string, NULL, NULL, 0, 0, 0, 0, NULL, NULL }
 
 
-struct  _Main__Data
+struct  _Data
 {
   ProtobufCMessage base;
   size_t n_report;
-  Main__Report **report;
+  Report **report;
   size_t n_weather;
-  Main__Weather **weather;
+  Weather **weather;
   size_t n_message;
-  Main__Message **message;
+  Message **message;
   size_t n_audio;
-  Main__Audio **audio;
+  Audio **audio;
   size_t n_file;
-  Main__File **file;
-  Main__Balloon *balloon;
-  Main__Plane *plane;
-  Main__Vessel *vessel;
-  Main__Vehicle *vehicle;
-  Main__Spacecraft *spacecraft;
+  File **file;
+  Balloon *balloon;
+  Plane *plane;
+  Vessel *vessel;
+  Vehicle *vehicle;
+  Spacecraft *spacecraft;
+  char *author;
+  uint32_t timestamp;
+  Location *location;
 };
-#define MAIN__DATA__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&main__data__descriptor) \
-    , 0,NULL, 0,NULL, 0,NULL, 0,NULL, 0,NULL, NULL, NULL, NULL, NULL, NULL }
+#define DATA__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&data__descriptor) \
+    , 0,NULL, 0,NULL, 0,NULL, 0,NULL, 0,NULL, NULL, NULL, NULL, NULL, NULL, (char *)protobuf_c_empty_string, 0, NULL }
 
 
-struct  _Main__Plane
+struct  _Plane
 {
   ProtobufCMessage base;
   uint32_t wind_speed;
   uint32_t ground_speed;
   char *squawk;
 };
-#define MAIN__PLANE__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&main__plane__descriptor) \
+#define PLANE__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&plane__descriptor) \
     , 0, 0, (char *)protobuf_c_empty_string }
 
 
-struct  _Main__Vessel
+struct  _Vessel
 {
   ProtobufCMessage base;
   char *name;
 };
-#define MAIN__VESSEL__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&main__vessel__descriptor) \
+#define VESSEL__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&vessel__descriptor) \
     , (char *)protobuf_c_empty_string }
 
 
-struct  _Main__Vehicle
+struct  _Vehicle
 {
   ProtobufCMessage base;
   uint32_t speed;
 };
-#define MAIN__VEHICLE__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&main__vehicle__descriptor) \
+#define VEHICLE__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&vehicle__descriptor) \
     , 0 }
 
 
-struct  _Main__Balloon
+struct  _Balloon
 {
   ProtobufCMessage base;
   uint32_t speed;
 };
-#define MAIN__BALLOON__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&main__balloon__descriptor) \
+#define BALLOON__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&balloon__descriptor) \
     , 0 }
 
 
-struct  _Main__Report
+struct  _Report
 {
   ProtobufCMessage base;
   char *subject;
   char *body;
 };
-#define MAIN__REPORT__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&main__report__descriptor) \
+#define REPORT__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&report__descriptor) \
     , (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string }
 
 
-struct  _Main__Spacecraft
+struct  _Spacecraft
 {
   ProtobufCMessage base;
-  uint32_t name;
+  char *name;
 };
-#define MAIN__SPACECRAFT__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&main__spacecraft__descriptor) \
-    , 0 }
+#define SPACECRAFT__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&spacecraft__descriptor) \
+    , (char *)protobuf_c_empty_string }
 
 
-struct  _Main__Weather
+struct  _Weather
 {
   ProtobufCMessage base;
-  uint64_t timestamp;
+  uint32_t timestamp;
   float temperature;
   float humidity;
   float pressure;
 };
-#define MAIN__WEATHER__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&main__weather__descriptor) \
+#define WEATHER__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&weather__descriptor) \
     , 0, 0, 0, 0 }
 
 
-struct  _Main__Message
+struct  _Message
 {
   ProtobufCMessage base;
   char *receiver;
   char *body;
-  Main__Location *location;
+  Location *location;
 };
-#define MAIN__MESSAGE__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&main__message__descriptor) \
+#define MESSAGE__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&message__descriptor) \
     , (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, NULL }
 
 
-struct  _Main__Audio
+struct  _Audio
 {
   ProtobufCMessage base;
   char *receiver;
   char *duration;
   ProtobufCBinaryData blob;
 };
-#define MAIN__AUDIO__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&main__audio__descriptor) \
+#define AUDIO__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&audio__descriptor) \
     , (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, {0,NULL} }
 
 
-struct  _Main__File
+struct  _File
 {
   ProtobufCMessage base;
   char *receiver;
   char *name;
   ProtobufCBinaryData blob;
 };
-#define MAIN__FILE__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&main__file__descriptor) \
+#define FILE__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&file__descriptor) \
     , (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, {0,NULL} }
 
 
-/* Main__Location methods */
-void   main__location__init
-                     (Main__Location         *message);
-size_t main__location__get_packed_size
-                     (const Main__Location   *message);
-size_t main__location__pack
-                     (const Main__Location   *message,
+/* Location methods */
+void   location__init
+                     (Location         *message);
+size_t location__get_packed_size
+                     (const Location   *message);
+size_t location__pack
+                     (const Location   *message,
                       uint8_t             *out);
-size_t main__location__pack_to_buffer
-                     (const Main__Location   *message,
+size_t location__pack_to_buffer
+                     (const Location   *message,
                       ProtobufCBuffer     *buffer);
-Main__Location *
-       main__location__unpack
+Location *
+       location__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   main__location__free_unpacked
-                     (Main__Location *message,
+void   location__free_unpacked
+                     (Location *message,
                       ProtobufCAllocator *allocator);
-/* Main__Payload methods */
-void   main__payload__init
-                     (Main__Payload         *message);
-size_t main__payload__get_packed_size
-                     (const Main__Payload   *message);
-size_t main__payload__pack
-                     (const Main__Payload   *message,
+/* Payload methods */
+void   payload__init
+                     (Payload         *message);
+size_t payload__get_packed_size
+                     (const Payload   *message);
+size_t payload__pack
+                     (const Payload   *message,
                       uint8_t             *out);
-size_t main__payload__pack_to_buffer
-                     (const Main__Payload   *message,
+size_t payload__pack_to_buffer
+                     (const Payload   *message,
                       ProtobufCBuffer     *buffer);
-Main__Payload *
-       main__payload__unpack
+Payload *
+       payload__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   main__payload__free_unpacked
-                     (Main__Payload *message,
+void   payload__free_unpacked
+                     (Payload *message,
                       ProtobufCAllocator *allocator);
-/* Main__Request methods */
-void   main__request__init
-                     (Main__Request         *message);
-size_t main__request__get_packed_size
-                     (const Main__Request   *message);
-size_t main__request__pack
-                     (const Main__Request   *message,
+/* Request methods */
+void   request__init
+                     (Request         *message);
+size_t request__get_packed_size
+                     (const Request   *message);
+size_t request__pack
+                     (const Request   *message,
                       uint8_t             *out);
-size_t main__request__pack_to_buffer
-                     (const Main__Request   *message,
+size_t request__pack_to_buffer
+                     (const Request   *message,
                       ProtobufCBuffer     *buffer);
-Main__Request *
-       main__request__unpack
+Request *
+       request__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   main__request__free_unpacked
-                     (Main__Request *message,
+void   request__free_unpacked
+                     (Request *message,
                       ProtobufCAllocator *allocator);
-/* Main__Pod methods */
-void   main__pod__init
-                     (Main__Pod         *message);
-size_t main__pod__get_packed_size
-                     (const Main__Pod   *message);
-size_t main__pod__pack
-                     (const Main__Pod   *message,
+/* Pod methods */
+void   pod__init
+                     (Pod         *message);
+size_t pod__get_packed_size
+                     (const Pod   *message);
+size_t pod__pack
+                     (const Pod   *message,
                       uint8_t             *out);
-size_t main__pod__pack_to_buffer
-                     (const Main__Pod   *message,
+size_t pod__pack_to_buffer
+                     (const Pod   *message,
                       ProtobufCBuffer     *buffer);
-Main__Pod *
-       main__pod__unpack
+Pod *
+       pod__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   main__pod__free_unpacked
-                     (Main__Pod *message,
+void   pod__free_unpacked
+                     (Pod *message,
                       ProtobufCAllocator *allocator);
-/* Main__Data methods */
-void   main__data__init
-                     (Main__Data         *message);
-size_t main__data__get_packed_size
-                     (const Main__Data   *message);
-size_t main__data__pack
-                     (const Main__Data   *message,
+/* Data methods */
+void   data__init
+                     (Data         *message);
+size_t data__get_packed_size
+                     (const Data   *message);
+size_t data__pack
+                     (const Data   *message,
                       uint8_t             *out);
-size_t main__data__pack_to_buffer
-                     (const Main__Data   *message,
+size_t data__pack_to_buffer
+                     (const Data   *message,
                       ProtobufCBuffer     *buffer);
-Main__Data *
-       main__data__unpack
+Data *
+       data__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   main__data__free_unpacked
-                     (Main__Data *message,
+void   data__free_unpacked
+                     (Data *message,
                       ProtobufCAllocator *allocator);
-/* Main__Plane methods */
-void   main__plane__init
-                     (Main__Plane         *message);
-size_t main__plane__get_packed_size
-                     (const Main__Plane   *message);
-size_t main__plane__pack
-                     (const Main__Plane   *message,
+/* Plane methods */
+void   plane__init
+                     (Plane         *message);
+size_t plane__get_packed_size
+                     (const Plane   *message);
+size_t plane__pack
+                     (const Plane   *message,
                       uint8_t             *out);
-size_t main__plane__pack_to_buffer
-                     (const Main__Plane   *message,
+size_t plane__pack_to_buffer
+                     (const Plane   *message,
                       ProtobufCBuffer     *buffer);
-Main__Plane *
-       main__plane__unpack
+Plane *
+       plane__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   main__plane__free_unpacked
-                     (Main__Plane *message,
+void   plane__free_unpacked
+                     (Plane *message,
                       ProtobufCAllocator *allocator);
-/* Main__Vessel methods */
-void   main__vessel__init
-                     (Main__Vessel         *message);
-size_t main__vessel__get_packed_size
-                     (const Main__Vessel   *message);
-size_t main__vessel__pack
-                     (const Main__Vessel   *message,
+/* Vessel methods */
+void   vessel__init
+                     (Vessel         *message);
+size_t vessel__get_packed_size
+                     (const Vessel   *message);
+size_t vessel__pack
+                     (const Vessel   *message,
                       uint8_t             *out);
-size_t main__vessel__pack_to_buffer
-                     (const Main__Vessel   *message,
+size_t vessel__pack_to_buffer
+                     (const Vessel   *message,
                       ProtobufCBuffer     *buffer);
-Main__Vessel *
-       main__vessel__unpack
+Vessel *
+       vessel__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   main__vessel__free_unpacked
-                     (Main__Vessel *message,
+void   vessel__free_unpacked
+                     (Vessel *message,
                       ProtobufCAllocator *allocator);
-/* Main__Vehicle methods */
-void   main__vehicle__init
-                     (Main__Vehicle         *message);
-size_t main__vehicle__get_packed_size
-                     (const Main__Vehicle   *message);
-size_t main__vehicle__pack
-                     (const Main__Vehicle   *message,
+/* Vehicle methods */
+void   vehicle__init
+                     (Vehicle         *message);
+size_t vehicle__get_packed_size
+                     (const Vehicle   *message);
+size_t vehicle__pack
+                     (const Vehicle   *message,
                       uint8_t             *out);
-size_t main__vehicle__pack_to_buffer
-                     (const Main__Vehicle   *message,
+size_t vehicle__pack_to_buffer
+                     (const Vehicle   *message,
                       ProtobufCBuffer     *buffer);
-Main__Vehicle *
-       main__vehicle__unpack
+Vehicle *
+       vehicle__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   main__vehicle__free_unpacked
-                     (Main__Vehicle *message,
+void   vehicle__free_unpacked
+                     (Vehicle *message,
                       ProtobufCAllocator *allocator);
-/* Main__Balloon methods */
-void   main__balloon__init
-                     (Main__Balloon         *message);
-size_t main__balloon__get_packed_size
-                     (const Main__Balloon   *message);
-size_t main__balloon__pack
-                     (const Main__Balloon   *message,
+/* Balloon methods */
+void   balloon__init
+                     (Balloon         *message);
+size_t balloon__get_packed_size
+                     (const Balloon   *message);
+size_t balloon__pack
+                     (const Balloon   *message,
                       uint8_t             *out);
-size_t main__balloon__pack_to_buffer
-                     (const Main__Balloon   *message,
+size_t balloon__pack_to_buffer
+                     (const Balloon   *message,
                       ProtobufCBuffer     *buffer);
-Main__Balloon *
-       main__balloon__unpack
+Balloon *
+       balloon__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   main__balloon__free_unpacked
-                     (Main__Balloon *message,
+void   balloon__free_unpacked
+                     (Balloon *message,
                       ProtobufCAllocator *allocator);
-/* Main__Report methods */
-void   main__report__init
-                     (Main__Report         *message);
-size_t main__report__get_packed_size
-                     (const Main__Report   *message);
-size_t main__report__pack
-                     (const Main__Report   *message,
+/* Report methods */
+void   report__init
+                     (Report         *message);
+size_t report__get_packed_size
+                     (const Report   *message);
+size_t report__pack
+                     (const Report   *message,
                       uint8_t             *out);
-size_t main__report__pack_to_buffer
-                     (const Main__Report   *message,
+size_t report__pack_to_buffer
+                     (const Report   *message,
                       ProtobufCBuffer     *buffer);
-Main__Report *
-       main__report__unpack
+Report *
+       report__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   main__report__free_unpacked
-                     (Main__Report *message,
+void   report__free_unpacked
+                     (Report *message,
                       ProtobufCAllocator *allocator);
-/* Main__Spacecraft methods */
-void   main__spacecraft__init
-                     (Main__Spacecraft         *message);
-size_t main__spacecraft__get_packed_size
-                     (const Main__Spacecraft   *message);
-size_t main__spacecraft__pack
-                     (const Main__Spacecraft   *message,
+/* Spacecraft methods */
+void   spacecraft__init
+                     (Spacecraft         *message);
+size_t spacecraft__get_packed_size
+                     (const Spacecraft   *message);
+size_t spacecraft__pack
+                     (const Spacecraft   *message,
                       uint8_t             *out);
-size_t main__spacecraft__pack_to_buffer
-                     (const Main__Spacecraft   *message,
+size_t spacecraft__pack_to_buffer
+                     (const Spacecraft   *message,
                       ProtobufCBuffer     *buffer);
-Main__Spacecraft *
-       main__spacecraft__unpack
+Spacecraft *
+       spacecraft__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   main__spacecraft__free_unpacked
-                     (Main__Spacecraft *message,
+void   spacecraft__free_unpacked
+                     (Spacecraft *message,
                       ProtobufCAllocator *allocator);
-/* Main__Weather methods */
-void   main__weather__init
-                     (Main__Weather         *message);
-size_t main__weather__get_packed_size
-                     (const Main__Weather   *message);
-size_t main__weather__pack
-                     (const Main__Weather   *message,
+/* Weather methods */
+void   weather__init
+                     (Weather         *message);
+size_t weather__get_packed_size
+                     (const Weather   *message);
+size_t weather__pack
+                     (const Weather   *message,
                       uint8_t             *out);
-size_t main__weather__pack_to_buffer
-                     (const Main__Weather   *message,
+size_t weather__pack_to_buffer
+                     (const Weather   *message,
                       ProtobufCBuffer     *buffer);
-Main__Weather *
-       main__weather__unpack
+Weather *
+       weather__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   main__weather__free_unpacked
-                     (Main__Weather *message,
+void   weather__free_unpacked
+                     (Weather *message,
                       ProtobufCAllocator *allocator);
-/* Main__Message methods */
-void   main__message__init
-                     (Main__Message         *message);
-size_t main__message__get_packed_size
-                     (const Main__Message   *message);
-size_t main__message__pack
-                     (const Main__Message   *message,
+/* Message methods */
+void   message__init
+                     (Message         *message);
+size_t message__get_packed_size
+                     (const Message   *message);
+size_t message__pack
+                     (const Message   *message,
                       uint8_t             *out);
-size_t main__message__pack_to_buffer
-                     (const Main__Message   *message,
+size_t message__pack_to_buffer
+                     (const Message   *message,
                       ProtobufCBuffer     *buffer);
-Main__Message *
-       main__message__unpack
+Message *
+       message__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   main__message__free_unpacked
-                     (Main__Message *message,
+void   message__free_unpacked
+                     (Message *message,
                       ProtobufCAllocator *allocator);
-/* Main__Audio methods */
-void   main__audio__init
-                     (Main__Audio         *message);
-size_t main__audio__get_packed_size
-                     (const Main__Audio   *message);
-size_t main__audio__pack
-                     (const Main__Audio   *message,
+/* Audio methods */
+void   audio__init
+                     (Audio         *message);
+size_t audio__get_packed_size
+                     (const Audio   *message);
+size_t audio__pack
+                     (const Audio   *message,
                       uint8_t             *out);
-size_t main__audio__pack_to_buffer
-                     (const Main__Audio   *message,
+size_t audio__pack_to_buffer
+                     (const Audio   *message,
                       ProtobufCBuffer     *buffer);
-Main__Audio *
-       main__audio__unpack
+Audio *
+       audio__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   main__audio__free_unpacked
-                     (Main__Audio *message,
+void   audio__free_unpacked
+                     (Audio *message,
                       ProtobufCAllocator *allocator);
-/* Main__File methods */
-void   main__file__init
-                     (Main__File         *message);
-size_t main__file__get_packed_size
-                     (const Main__File   *message);
-size_t main__file__pack
-                     (const Main__File   *message,
+/* File methods */
+void   file__init
+                     (File         *message);
+size_t file__get_packed_size
+                     (const File   *message);
+size_t file__pack
+                     (const File   *message,
                       uint8_t             *out);
-size_t main__file__pack_to_buffer
-                     (const Main__File   *message,
+size_t file__pack_to_buffer
+                     (const File   *message,
                       ProtobufCBuffer     *buffer);
-Main__File *
-       main__file__unpack
+File *
+       file__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   main__file__free_unpacked
-                     (Main__File *message,
+void   file__free_unpacked
+                     (File *message,
                       ProtobufCAllocator *allocator);
 /* --- per-message closures --- */
 
-typedef void (*Main__Location_Closure)
-                 (const Main__Location *message,
+typedef void (*Location_Closure)
+                 (const Location *message,
                   void *closure_data);
-typedef void (*Main__Payload_Closure)
-                 (const Main__Payload *message,
+typedef void (*Payload_Closure)
+                 (const Payload *message,
                   void *closure_data);
-typedef void (*Main__Request_Closure)
-                 (const Main__Request *message,
+typedef void (*Request_Closure)
+                 (const Request *message,
                   void *closure_data);
-typedef void (*Main__Pod_Closure)
-                 (const Main__Pod *message,
+typedef void (*Pod_Closure)
+                 (const Pod *message,
                   void *closure_data);
-typedef void (*Main__Data_Closure)
-                 (const Main__Data *message,
+typedef void (*Data_Closure)
+                 (const Data *message,
                   void *closure_data);
-typedef void (*Main__Plane_Closure)
-                 (const Main__Plane *message,
+typedef void (*Plane_Closure)
+                 (const Plane *message,
                   void *closure_data);
-typedef void (*Main__Vessel_Closure)
-                 (const Main__Vessel *message,
+typedef void (*Vessel_Closure)
+                 (const Vessel *message,
                   void *closure_data);
-typedef void (*Main__Vehicle_Closure)
-                 (const Main__Vehicle *message,
+typedef void (*Vehicle_Closure)
+                 (const Vehicle *message,
                   void *closure_data);
-typedef void (*Main__Balloon_Closure)
-                 (const Main__Balloon *message,
+typedef void (*Balloon_Closure)
+                 (const Balloon *message,
                   void *closure_data);
-typedef void (*Main__Report_Closure)
-                 (const Main__Report *message,
+typedef void (*Report_Closure)
+                 (const Report *message,
                   void *closure_data);
-typedef void (*Main__Spacecraft_Closure)
-                 (const Main__Spacecraft *message,
+typedef void (*Spacecraft_Closure)
+                 (const Spacecraft *message,
                   void *closure_data);
-typedef void (*Main__Weather_Closure)
-                 (const Main__Weather *message,
+typedef void (*Weather_Closure)
+                 (const Weather *message,
                   void *closure_data);
-typedef void (*Main__Message_Closure)
-                 (const Main__Message *message,
+typedef void (*Message_Closure)
+                 (const Message *message,
                   void *closure_data);
-typedef void (*Main__Audio_Closure)
-                 (const Main__Audio *message,
+typedef void (*Audio_Closure)
+                 (const Audio *message,
                   void *closure_data);
-typedef void (*Main__File_Closure)
-                 (const Main__File *message,
+typedef void (*File_Closure)
+                 (const File *message,
                   void *closure_data);
 
 /* --- services --- */
@@ -565,21 +568,21 @@ typedef void (*Main__File_Closure)
 
 /* --- descriptors --- */
 
-extern const ProtobufCMessageDescriptor main__location__descriptor;
-extern const ProtobufCMessageDescriptor main__payload__descriptor;
-extern const ProtobufCMessageDescriptor main__request__descriptor;
-extern const ProtobufCMessageDescriptor main__pod__descriptor;
-extern const ProtobufCMessageDescriptor main__data__descriptor;
-extern const ProtobufCMessageDescriptor main__plane__descriptor;
-extern const ProtobufCMessageDescriptor main__vessel__descriptor;
-extern const ProtobufCMessageDescriptor main__vehicle__descriptor;
-extern const ProtobufCMessageDescriptor main__balloon__descriptor;
-extern const ProtobufCMessageDescriptor main__report__descriptor;
-extern const ProtobufCMessageDescriptor main__spacecraft__descriptor;
-extern const ProtobufCMessageDescriptor main__weather__descriptor;
-extern const ProtobufCMessageDescriptor main__message__descriptor;
-extern const ProtobufCMessageDescriptor main__audio__descriptor;
-extern const ProtobufCMessageDescriptor main__file__descriptor;
+extern const ProtobufCMessageDescriptor location__descriptor;
+extern const ProtobufCMessageDescriptor payload__descriptor;
+extern const ProtobufCMessageDescriptor request__descriptor;
+extern const ProtobufCMessageDescriptor pod__descriptor;
+extern const ProtobufCMessageDescriptor data__descriptor;
+extern const ProtobufCMessageDescriptor plane__descriptor;
+extern const ProtobufCMessageDescriptor vessel__descriptor;
+extern const ProtobufCMessageDescriptor vehicle__descriptor;
+extern const ProtobufCMessageDescriptor balloon__descriptor;
+extern const ProtobufCMessageDescriptor report__descriptor;
+extern const ProtobufCMessageDescriptor spacecraft__descriptor;
+extern const ProtobufCMessageDescriptor weather__descriptor;
+extern const ProtobufCMessageDescriptor message__descriptor;
+extern const ProtobufCMessageDescriptor audio__descriptor;
+extern const ProtobufCMessageDescriptor file__descriptor;
 
 PROTOBUF_C__END_DECLS
 
