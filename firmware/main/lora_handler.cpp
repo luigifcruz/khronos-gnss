@@ -23,7 +23,7 @@ uint8_t *readLine2(uart_port_t uart, size_t *len) {
 void LoraHandler::LoraChannel(void *pvParameters) {
   uart_config_t uart_config;
 
-  uart_config.baud_rate = 9600;
+  uart_config.baud_rate = 115200;
   uart_config.data_bits = UART_DATA_8_BITS;
   uart_config.parity = UART_PARITY_DISABLE;
   uart_config.stop_bits = UART_STOP_BITS_1;
@@ -39,7 +39,7 @@ void LoraHandler::LoraChannel(void *pvParameters) {
 
   sqlite3 *db_rx;
   sqlite3_open("/spiffs/database_rx.db", &db_rx);
-  if (nullPointer(db_rx)) return;
+  if (is_null(db_rx)) return;
 
   while (1) {
     size_t length = 0;
@@ -49,7 +49,7 @@ void LoraHandler::LoraChannel(void *pvParameters) {
     char filename[64];
     sprintf(filename, "/spiffs/rx_cache/small-%d.pb", (int)time(NULL));
     FILE *fp = fopen((char *)filename, "wb");
-    if (nullPointer(fp)) continue;
+    if (is_null(fp)) continue;
 
     fwrite(buf, length, 1, fp);
     fclose(fp);
@@ -61,7 +61,7 @@ void LoraHandler::LoraChannel(void *pvParameters) {
       continue;
     }
 
-    restorePayloads(db_rx);
+    restore_payloads(db_rx);
   }
 }
 

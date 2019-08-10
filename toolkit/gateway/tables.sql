@@ -12,8 +12,6 @@ CREATE TABLE IF NOT EXISTS "pods" (
     "priority" integer NOT NULL,
     "hops" integer NOT NULL,
     "hops" integer NOT NULL,
-    "valid" integer DEFAULT 1,
-    "complete" integer DEFAULT 0,
     PRIMARY KEY (id));
 
 CREATE TABLE IF NOT EXISTS "payloads" (
@@ -23,6 +21,7 @@ CREATE TABLE IF NOT EXISTS "payloads" (
     "chunk_num" integer NOT NULL,
     "hash_key" blob NOT NULL,
     "data" blob NOT NULL, 
+    "processed" integer DEFAULT 0,
     PRIMARY KEY (id)
     FOREIGN KEY(payload_pod) REFERENCES pods(id));
 

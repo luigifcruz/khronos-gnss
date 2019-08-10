@@ -1,14 +1,20 @@
 #include "aulora.h"
 
-int nullPointer(void* ptr) {
+void hash_str(const uint8_t* hash, char* str_hash) {
+  for (int i = 0; i < HASH_LENGTH; i++) {
+    sprintf(str_hash + (i * 2), "%02x", hash[i]);
+  }
+}
+
+int is_null(void* ptr) {
   if (ptr == NULL) return 1;
   return 0;
 }
 
-uint8_t* fileHash(uint8_t* file_name) {
+uint8_t* file_hash(uint8_t* file_name) {
   FILE* fp = fopen((void*)file_name, "rb");
 
-  if (nullPointer(fp)) return NULL;
+  if (is_null(fp)) return NULL;
 
   int bytes;
   static uint8_t c[HASH_LENGTH] = {0};
@@ -29,11 +35,11 @@ uint8_t* fileHash(uint8_t* file_name) {
   return (uint8_t*)&c;
 }
 
-size_t fileSize(uint8_t* file_name) {
+size_t file_size(uint8_t* file_name) {
   size_t size;
   FILE* fp = fopen((void*)file_name, "rb");
 
-  if (nullPointer(fp)) return -1;
+  if (is_null(fp)) return -1;
 
   fseek(fp, 0L, SEEK_END);
   size = ftell(fp);
@@ -44,10 +50,10 @@ size_t fileSize(uint8_t* file_name) {
   return size;
 }
 
-size_t loadFile(uint8_t* buffer, uint8_t* file_name) {
+size_t load_file(uint8_t* buffer, uint8_t* file_name) {
   FILE* fp = fopen((void*)file_name, "rb");
 
-  if (nullPointer(fp)) return -1;
+  if (is_null(fp)) return -1;
 
   fseek(fp, 0L, SEEK_END);
   size_t size = ftell(fp);
@@ -59,11 +65,11 @@ size_t loadFile(uint8_t* buffer, uint8_t* file_name) {
   return size;
 }
 
-size_t fileChunk(uint8_t* buffer, uint8_t* file_name, size_t size,
+size_t file_chunk(uint8_t* buffer, uint8_t* file_name, size_t size,
                  size_t chunk) {
   FILE* fp = fopen((void*)file_name, "rb");
 
-  if (nullPointer(fp)) return -1;
+  if (is_null(fp)) return -1;
 
   size_t chunk_len = MAX_PAYLOAD_SIZE;
   size_t chunk_past = chunk_len * chunk;
@@ -77,7 +83,7 @@ size_t fileChunk(uint8_t* buffer, uint8_t* file_name, size_t size,
   return chunk_len;
 }
 
-int createPod(sqlite3* db, Pod pod) {
+int create_pod(sqlite3* db, Pod pod) {
   uint32_t id = (uint32_t)rand();
   char pod_create_sql[512];
 
@@ -97,7 +103,7 @@ int createPod(sqlite3* db, Pod pod) {
   return (int)id;
 }
 
-int createPayload(sqlite3* db, int pod_id, Payload pl) {
+int create_payload(sqlite3* db, int pod_id, Payload pl) {
   uint32_t id = (uint32_t)rand();
   char pl_create_sql[512];
 
@@ -121,7 +127,7 @@ int createPayload(sqlite3* db, int pod_id, Payload pl) {
   return (int)id;
 }
 
-int findPayload(sqlite3* db, uint32_t chunk, uint8_t* hash, size_t len) {
+int find_payload(sqlite3* db, uint32_t chunk, uint8_t* hash, size_t len) {
   char pl_create_sql[512];
 
   snprintf(pl_create_sql, sizeof(pl_create_sql),
@@ -145,11 +151,11 @@ int findPayload(sqlite3* db, uint32_t chunk, uint8_t* hash, size_t len) {
   return 0;
 }
 
-int txPayload(sqlite3* db, uint8_t* file_name) {
+int tx_payload(sqlite3* db, uint8_t* file_name) {
   printf("[TX_PAYLOAD] Transmitting payload...\n");
 
-  size_t size = fileSize(file_name);
-  uint8_t* hash = fileHash(file_name);
+  size_t size = file_size(file_name);
+  uint8_t* hash = file_hash(file_name);
 
   printf("Payload size is %d.\n", (int)size);
   printf("Payload MD5 hash is: ");
@@ -180,7 +186,7 @@ int txPayload(sqlite3* db, uint8_t* file_name) {
   pod.hops = 0;
 
   int id = -1;
-  if ((id = createPod(db, pod)) == -1) {
+  if ((id = create_pod(db, pod)) == -1) {
     return 3;
   }
 
@@ -188,7 +194,7 @@ int txPayload(sqlite3* db, uint8_t* file_name) {
     printf("  Generating Payload %d/%d.\n", i + 1, (int)chunk_num);
 
     uint8_t data_buf[MAX_PAYLOAD_SIZE];
-    size_t data_len = fileChunk((uint8_t*)&data_buf, file_name, size, i);
+    size_t data_len = file_chunk((uint8_t*)&data_buf, file_name, size, i);
 
     Payload pl = PAYLOAD__INIT;
 
@@ -199,7 +205,7 @@ int txPayload(sqlite3* db, uint8_t* file_name) {
     pl.data.data = data_buf;
     pl.data.len = data_len;
 
-    if (createPayload(db, id, pl) == -1) {
+    if (create_payload(db, id, pl) == -1) {
       return 3;
     }
 
@@ -207,14 +213,14 @@ int txPayload(sqlite3* db, uint8_t* file_name) {
 
     size_t pod_len = pod__get_packed_size(&pod);
     uint8_t* pod_buf = (uint8_t*)malloc(pod_len);
-    if (nullPointer(pod_buf)) return 1;
+    if (is_null(pod_buf)) return 1;
 
     pod__pack(&pod, pod_buf);
 
     uint8_t filename[32];
     sprintf((void*)filename, "/spiffs/rx_cache/small-%d.pb", i);
     FILE* fp = fopen((void*)filename, "wb");
-    if (nullPointer(fp)) return 1;
+    if (is_null(fp)) return 1;
 
     fwrite(pod_buf, pod_len, 1, fp);
     fclose(fp);
@@ -224,21 +230,25 @@ int txPayload(sqlite3* db, uint8_t* file_name) {
   return 0;
 }
 
-int rxPayload(sqlite3* db, Pod* pod) {
+int rx_payload(sqlite3* db, Pod* pod) {
   printf("[RX_PAYLOAD] Parsing payload...\n");
 
-  int r = findPayload(db, pod->payload->chunk, pod->payload->hash_key.data,
+  int r = find_payload(db, pod->payload->chunk, pod->payload->hash_key.data,
                       pod->payload->hash_key.len);
 
   if (!r) {
+    char str[HASH_LENGTH * 2];
+    hash_str(pod->payload->hash_key.data, (char*)&str);
+
     printf("[RX_PAYLOAD] New payload identified.\n");
+    printf("Chunk %d (MD5: %s)\n", pod->payload->chunk, str);
 
     int id = -1;
-    if ((id = createPod(db, *pod)) == -1) {
+    if ((id = create_pod(db, *pod)) == -1) {
       return 3;
     }
 
-    if (createPayload(db, id, *(pod->payload)) == -1) {
+    if (create_payload(db, id, *(pod->payload)) == -1) {
       return 3;
     }
   } else {
@@ -248,12 +258,12 @@ int rxPayload(sqlite3* db, Pod* pod) {
   return -1;
 }
 
-int rxRequest(sqlite3* db, Pod* pod) {
+int rx_request(sqlite3* db, Pod* pod) {
   printf("[RX_REQUEST] Parsing request...\n");
   return -1;
 }
 
-int validatePayload(Payload* pl) {
+int validate_payload(Payload* pl) {
   int err = 0;
 
   err += (pl->chunk > pl->chunk_num);
@@ -263,7 +273,7 @@ int validatePayload(Payload* pl) {
   return err;
 }
 
-int validateRequest(Request* req) {
+int validate_request(Request* req) {
   int err = 0;
 
   err += (req->hash_key.len == 0);
@@ -271,7 +281,7 @@ int validateRequest(Request* req) {
   return err;
 }
 
-int validatePod(Pod* pod) {
+int validate_pod(Pod* pod) {
   int err = 0;
 
   err += (pod->payload != NULL && pod->request != NULL);
@@ -284,10 +294,8 @@ int validatePod(Pod* pod) {
 }
 
 int receive(sqlite3* db, char* file_name) {
-  printf("[RX] New message received...\n");
-
   uint8_t payload[MAX_POD_SIZE];
-  size_t size = loadFile((uint8_t*)&payload, (void*)file_name);
+  size_t size = load_file((uint8_t*)&payload, (void*)file_name);
 
   if (size == -1) {
     printf("Error: Opening the payload file.\n");
@@ -295,31 +303,31 @@ int receive(sqlite3* db, char* file_name) {
   }
 
   Pod* pod = pod__unpack(NULL, size, (uint8_t*)&payload);
-  if (nullPointer(pod)) return 2;
+  if (is_null(pod)) return 2;
 
   int err = 0;
 
-  if ((err = validatePod(pod))) {
+  if ((err = validate_pod(pod))) {
     printf("[RX] Invalid packet (%d).\n", err);
     return 1;
   };
 
   if (pod->payload != NULL) {
-    if ((err = validatePayload(pod->payload))) {
+    if ((err = validate_payload(pod->payload))) {
       printf("[RX] Invalid payload (%d).\n", err);
       return 1;
     };
 
-    rxPayload(db, pod);
+    rx_payload(db, pod);
   }
 
   if (pod->request != NULL) {
-    if ((err = validateRequest(pod->request))) {
+    if ((err = validate_request(pod->request))) {
       printf("[RX] Invalid request (%d).\n", err);
       return 1;
     };
 
-    rxRequest(db, pod);
+    rx_request(db, pod);
   }
 
   pod__free_unpacked(pod, NULL);
@@ -331,43 +339,73 @@ int receive(sqlite3* db, char* file_name) {
   return 0;
 }
 
-int restorePayloads(sqlite3* db) {
-  char pl_create_sql[] =
-      "SELECT * FROM payloads ORDER BY chunk ASC, hash_key ASC;";
-
-  int rc;
+int exec(char* query, sqlite3* db, void (*worker)(sqlite3_stmt*, sqlite3*)) {
   sqlite3_stmt* stmt = NULL;
-  rc = sqlite3_prepare_v2(db, pl_create_sql, -1, &stmt, 0);
 
-  if (rc != SQLITE_OK) {
+  if (sqlite3_prepare_v2(db, query, -1, &stmt, 0) != SQLITE_OK) {
     printf("Error: Finding Payloads Hash. Err: %s\n", sqlite3_errmsg(db));
     return -1;
   }
 
   while (sqlite3_step(stmt) == SQLITE_ROW) {
-    int chunk = sqlite3_column_int(stmt, 2);
-    uint8_t* hash = sqlite3_column_blob(stmt, 4);
-
-    char str_hash[HASH_LENGTH * 2];
-    for (int i = 0; i < HASH_LENGTH; i++) {
-      sprintf(str_hash + (i * 2), "%02x", hash[i]);
-    }
-
-    size_t size = sqlite3_column_bytes(stmt, 5);
-    uint8_t* payload = sqlite3_column_blob(stmt, 5);
-
-    char filename[64];
-    sprintf(filename, "/spiffs/%.*s", 24, str_hash);
-    FILE* fp = fopen(filename, "ab");
-    if (nullPointer(fp)) return 1;
-
-    fseek(fp, chunk * MAX_PAYLOAD_SIZE, SEEK_SET);
-    fwrite(payload, size, 1, fp);
-    fclose(fp);
-
-    printf("Chunk %d (MD5: %s) %s\n", chunk, str_hash, filename);
+    worker(stmt, db);
   }
 
   sqlite3_finalize(stmt);
   return 0;
+}
+
+void keys(sqlite3_stmt* stmt, sqlite3* db) {
+  int chunk = sqlite3_column_int(stmt, 1);
+  const uint8_t* hash = sqlite3_column_blob(stmt, 0);
+
+  char str[HASH_LENGTH * 2];
+  hash_str(hash, (char*)&str);
+
+  char sql[] =
+      "SELECT data, (SELECT count(*) FROM payloads WHERE hash_key == ?) FROM "
+      "payloads WHERE hash_key == ? AND processed == 0 ORDER BY chunk ASC";
+
+  int rc;
+  sqlite3_stmt* stmt2 = NULL;
+
+  rc = sqlite3_prepare_v2(db, sql, -1, &stmt2, 0);
+  rc = sqlite3_bind_blob(stmt2, 1, hash, HASH_LENGTH, NULL);
+  rc = sqlite3_bind_blob(stmt2, 2, hash, HASH_LENGTH, NULL);
+
+  if (rc != SQLITE_OK) {
+    printf("Error: Finding Payloads. Err: %s\n", sqlite3_errmsg(db));
+    return;
+  }
+
+  char filename[64];
+  sprintf(filename, "/spiffs/%.*s", 24, str);
+
+  while (sqlite3_step(stmt2) == SQLITE_ROW) {
+    int c = sqlite3_column_int(stmt2, 1);
+
+    if (c != chunk) {
+      sqlite3_finalize(stmt2);
+      return;
+    }
+
+    size_t size = sqlite3_column_bytes(stmt2, 0);
+    const uint8_t* payload = sqlite3_column_blob(stmt2, 0);
+
+    FILE* fp = fopen(filename, "ab");
+    if (is_null(fp)) return;
+
+    fseek(fp, chunk * MAX_PAYLOAD_SIZE, SEEK_SET);
+    fwrite(payload, size, 1, fp);
+    fclose(fp);
+  }
+
+  printf("File Generated: %s\n", filename);
+  sqlite3_finalize(stmt2);
+};
+
+int restore_payloads(sqlite3* db) {
+  return exec(
+      "SELECT DISTINCT hash_key, chunk_num FROM payloads ORDER BY chunk ASC",
+      db, keys);
 }
